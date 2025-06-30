@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tezab Gold Testing</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="text-center text-warning fw-bold">✨ Sarim Gold Testing ✨</h2>
+    <form method="post" action="/submit" class="mt-4">
+        <div class="mb-3">
+            <label class="form-label">Client Name</label>
+            <input name="client_name" class="form-control" placeholder="Optional">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Weight in Air (grams)</label>
+            <input name="weight_air" type="number" step="0.001" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Weight in Water (grams)</label>
+            <input name="weight_water" type="number" step="0.001" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">24K Gold Rate (Tola)</label>
+            <input name="gold_rate_tola" type="number" step="1" class="form-control" value="355000">
+        </div>
+        <button class="btn btn-warning w-100">Generate Report</button>
+    </form>
+</div>
+</body>
+</html>
