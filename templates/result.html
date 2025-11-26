@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tezab Gold Report</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Tezab Gold Report - Enhanced</title>
+    <!-- <link rel="stylesheet" href="/static/style.css"> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         @media print {
             .no-print { display: none; }
+            .tab-content { display: block !important; }
         }
         .section-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -21,62 +22,170 @@
             font-weight: bold;
             color: #856404;
         }
-    </style>
-    <script>
-        function printPage() {
-            window.print();
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 600;
         }
-    </script>
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        .test-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        .badge-surface { background: #28a745; color: white; }
+        .badge-middle { background: #ffc107; color: black; }
+        .badge-inner { background: #dc3545; color: white; }
+    </style>
 </head>
-<body class="p-4 bg-light">
-    <div class="container bg-white border p-4 shadow-lg rounded">
-        <h3 class="text-center text-warning fw-bold">✨ Tezab Gold Testing Premium Report ✨</h3>
+<body>
+    <div class="container-fluid bg-white border p-4 shadow-lg rounded">
+        <h3 class="text-center text-warning fw-bold">✨ Tezab Gold Testing - Advanced Multi-Layer Analysis ✨</h3>
         <hr>
 
-        <!-- Basic Information -->
-        <h5 class="section-header">📋 Basic Information</h5>
-        <table class="table table-bordered">
-            <tr><th width="40%">🧾 Serial No</th><td>{{ data.serial_no }}</td></tr>
-            <tr><th>👤 Client</th><td>{{ data.client_name }}</td></tr>
-            <tr><th>📆 Date & Time</th><td>{{ data.date_time }}</td></tr>
-            <tr><th>💰 Gold Rate</th><td>Rs. {{ '{:,.0f}'.format(data.gold_rate_tola) }} per Tola (Rs. {{ '%.2f' % data.gold_rate_gram }} per gram)</td></tr>
-        </table>
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4 no-print" id="reportTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main-report" type="button">
+                    📋 Main Report
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="test1-tab" data-bs-toggle="tab" data-bs-target="#test1" type="button">
+                    🔬 Test 1
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="test2-tab" data-bs-toggle="tab" data-bs-target="#test2" type="button">
+                    🔬 Test 2
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="test3-tab" data-bs-toggle="tab" data-bs-target="#test3" type="button">
+                    🔬 Test 3
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="test4-tab" data-bs-toggle="tab" data-bs-target="#test4" type="button">
+                    🔬 Test 4
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="test5-tab" data-bs-toggle="tab" data-bs-target="#test5" type="button">
+                    🔬 Test 5
+                </button>
+            </li>
+        </ul>
 
-        <!-- Test Results -->
-        <h5 class="section-header">⚖️ Test Results</h5>
-        <table class="table table-bordered table-striped">
-            {% for key, value in extra_data.items() %}
-            <tr {% if 'Ratti Difference' in key %}class="ratti-highlight"{% endif %}>
-                <th width="40%">{{ key }}</th>
-                <td><strong>{{ value }}</strong></td>
-            </tr>
+        <!-- Tab Content -->
+        <div class="tab-content" id="reportTabsContent">
+            
+            <!-- MAIN REPORT (Original) -->
+            <div class="tab-pane fade show active" id="main-report" role="tabpanel">
+                <h5 class="section-header">📋 Basic Information</h5>
+                <table class="table table-bordered">
+                    <tr><th width="40%">🧾 Serial No</th><td>{{ data.serial_no }}</td></tr>
+                    <tr><th>👤 Client</th><td>{{ data.client_name }}</td></tr>
+                    <tr><th>📆 Date & Time</th><td>{{ data.date_time }}</td></tr>
+                    <tr><th>💰 Gold Rate</th><td>Rs. {{ '{:,.0f}'.format(data.gold_rate_tola) }} per Tola (Rs. {{ '%.2f' % data.gold_rate_gram }} per gram)</td></tr>
+                </table>
+
+                <h5 class="section-header">⚖️ Test Results</h5>
+                <table class="table table-bordered table-striped">
+                    {% for key, value in extra_data.items() %}
+                    <tr {% if 'Ratti Difference' in key %}class="ratti-highlight"{% endif %}>
+                        <th width="40%">{{ key }}</th>
+                        <td><strong>{{ value }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <h5 class="section-header">💎 Purity Analysis</h5>
+                <table class="table table-bordered">
+                    <tr><th width="40%">🌟 Purity</th><td class="fw-bold text-success">{{ '%.2f' % data.purity }}%</td></tr>
+                    <tr><th>👑 Karat</th><td class="fw-bold">{{ '%.2f' % data.karat }}K / 24K</td></tr>
+                    <tr><th>Pure Gold</th><td class="fw-bold">{{ '%.4f' % data.pure_gold }} g</td></tr>
+                    <tr><th>Impurities</th><td class="fw-bold">{{ '%.4f' % data.impurities }} g</td></tr>
+                </table>
+
+                <h5 class="section-header">💰 Financial Details</h5>
+                <table class="table table-bordered">
+                    <tr><th width="40%">💰 Estimated Value</th><td class="fw-bold text-primary">Rs. {{ '{:,.2f}'.format(data.estimated_value) }}</td></tr>
+                    <tr><th>🧾 Testing Fee</th><td>Rs. 200</td></tr>
+                </table>
+            </div>
+
+            <!-- TEST 1 -->
+            {% for test in multi_tests %}
+            <div class="tab-pane fade" id="test{{ test.test_no }}" role="tabpanel">
+                <div class="alert alert-info">
+                    <h5>🔬 Multi-Layer Detection - Test {{ test.test_no }}</h5>
+                    <p><strong>Layer Detected:</strong> {{ test.layer }}</p>
+                    <span class="test-badge {% if test.test_no in [1,3] %}badge-surface{% elif test.test_no == 2 %}badge-middle{% else %}badge-inner{% endif %}">
+                        {{ test.detected_metal }}
+                    </span>
+                </div>
+
+                <h5 class="section-header">⚖️ Weight Analysis</h5>
+                <table class="table table-bordered">
+                    <tr><th width="40%">📏 Total Weight</th><td>{{ test.total_weight }} grams</td></tr>
+                    <tr><th>🥇 Pure Gold</th><td class="fw-bold text-success">{{ test.pure_gold }} grams</td></tr>
+                    <tr><th>⚠️ Total Impurity</th><td class="fw-bold text-danger">{{ test.impurity }} grams</td></tr>
+                </table>
+
+                <h5 class="section-header">💎 Purity Metrics</h5>
+                <table class="table table-bordered">
+                    <tr class="ratti-highlight">
+                        <th width="40%">📊 Ratti Difference</th>
+                        <td><strong>{{ test.ratti_diff }} ratti</strong></td>
+                    </tr>
+                    <tr><th>🌟 Purity Percentage</th><td class="fw-bold">{{ test.purity }}%</td></tr>
+                    <tr><th>👑 Karat (out of 24K)</th><td class="fw-bold">{{ test.karat }}K / 24K</td></tr>
+                    <tr><th>🔢 Parts per Thousand</th><td>{{ test.parts_per_thousand }} / 1000</td></tr>
+                </table>
+
+                <h5 class="section-header">🔌 Electronic Testing Values</h5>
+                <table class="table table-bordered">
+                    <tr><th width="40%">⚡ IN Value</th><td>{{ test.in_value }}</td></tr>
+                    <tr><th>📤 OUT Value</th><td>{{ test.out_value }}</td></tr>
+                    <tr><th>📊 Difference</th><td class="fw-bold">{{ '%.2f' % (test.out_value - test.in_value) }}</td></tr>
+                </table>
+
+                <h5 class="section-header">💰 Value Calculation</h5>
+                <table class="table table-bordered">
+                    <tr><th width="40%">Gold Rate per Gram</th><td>Rs. {{ '%.2f' % gold_rate_gram }}</td></tr>
+                    <tr><th>💰 Pure Gold Value</th><td class="fw-bold text-primary">Rs. {{ '{:,.2f}'.format(test.pure_gold * gold_rate_gram) }}</td></tr>
+                </table>
+
+                <div class="alert alert-warning mt-3">
+                    <strong>⚠️ Note:</strong> This test detected <strong>{{ test.detected_metal }}</strong> with {{ test.purity }}% purity. 
+                    {% if test.test_no in [3, 5] %}
+                    <br><em>This is a confirmation retest of Test {{ test.test_no - 2 }}.</em>
+                    {% endif %}
+                </div>
+            </div>
             {% endfor %}
-        </table>
 
-        <!-- Purity -->
-        <h5 class="section-header">💎 Purity Analysis</h5>
-        <table class="table table-bordered">
-            <tr><th width="40%">🌟 Purity</th><td class="fw-bold text-success">{{ '%.2f' % data.purity }}%</td></tr>
-            <tr><th>👑 Karat</th><td class="fw-bold">{{ '%.2f' % data.karat }}K / 24K</td></tr>
-        </table>
-
-        <!-- Financial -->
-        <h5 class="section-header">💰 Financial Details</h5>
-        <table class="table table-bordered">
-            <tr><th width="40%">💰 Estimated Value</th><td class="fw-bold text-primary">Rs. {{ '{:,.2f}'.format(data.estimated_value) }}</td></tr>
-            <tr><th>🧾 Testing Fee</th><td>Rs. 200</td></tr>
-        </table>
+        </div>
 
         <p class="text-end mt-4 text-muted">✅ Thank you for choosing <b>Tezab Gold Testing</b></p>
 
         <div class="text-center mt-4 no-print">
-            <button onclick="printPage()" class="btn btn-success btn-lg">
-                🖨️ Print Report
+            <button onclick="window.print()" class="btn btn-success btn-lg">
+                🖨️ Print All Reports
             </button>
             <a href="/" class="btn btn-secondary btn-lg ms-2">
                 🏠 New Test
             </a>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
