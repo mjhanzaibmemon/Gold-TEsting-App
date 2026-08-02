@@ -230,6 +230,7 @@ input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
     <div class="tab on" data-t="test">⚖️ Auto Test</div>
     <div class="tab" data-t="jewelry">💎 Jewelry XRF</div>
     <div class="tab" data-t="manual">🔬 Manual Modes</div>
+    <div class="tab" data-t="calc">🧮 Calculators</div>
     <div class="tab" data-t="history">📋 History</div>
     <div class="tab" data-t="settings">⚙️ Settings</div>
 </div>
@@ -677,6 +678,237 @@ input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
     </div>
 </div>
 </div>
+</div>
+
+<!-- ======== CALCULATORS PANEL ======== -->
+<div class="pnl" id="p-calc">
+    <!-- Sub-tabs for 3 calculators -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn bg bs calc-tab" data-ct="rev" onclick="selCalc(this)" style="flex:1;min-width:150px">🔄 Reverse Purity</button>
+        <button class="btn bs calc-tab" data-ct="alloy" onclick="selCalc(this)" style="flex:1;min-width:150px;background:var(--bdr);color:var(--txt)">⚗️ Alloying</button>
+        <button class="btn bs calc-tab" data-ct="zakat" onclick="selCalc(this)" style="flex:1;min-width:150px;background:var(--bdr);color:var(--txt)">🕌 Zakat</button>
+    </div>
+
+    <!-- ─── Reverse Purity Calculator ─── -->
+    <div class="calc-panel" id="cp-rev">
+    <div class="mg">
+        <div>
+            <div class="cd">
+                <div class="cd-h">🔄 Reverse Purity Calculator</div>
+                <div class="cd-b">
+                    <div class="ig"><label>Enter Karat</label><input type="number" step="any" id="revK" value="22" oninput="calcReverse()" min="1" max="24"><span class="unit">K</span></div>
+                    <div class="ig"><label>Piece Weight (for water-weight preview)</label><input type="number" step="any" id="revWt" value="10" oninput="calcReverse()"><span class="unit">g</span></div>
+                    <div class="ig"><label>Alloy Model</label>
+                        <select id="revModel" onchange="calcReverse()">
+                            <option value="ternary">Ternary (Au-Ag-Cu) — Standard</option>
+                            <option value="binary_cu">Binary Au-Cu (Rose Gold)</option>
+                            <option value="binary_ag">Binary Au-Ag (White Gold)</option>
+                        </select>
+                    </div>
+                    <div style="font-size:.7rem;color:var(--mut);margin-top:8px;padding:8px;background:rgba(212,175,55,.05);border-radius:6px">
+                        💡 Enter the karat customer <b>claims</b>. Compare with your actual Archimedes test result to detect misrepresentation.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="cd">
+                <div class="cd-h">📊 Expected Values</div>
+                <div class="cd-b">
+                    <div class="rg" id="revResGrid" style="grid-template-columns:1fr 1fr">
+                        <div class="rb"><div class="rl">Expected Density</div><div class="rv" style="color:var(--blu)" id="revDen">—</div><div class="rs">g/cm³</div></div>
+                        <div class="rb"><div class="rl">Hallmark</div><div class="rv" style="color:var(--g)" id="revHall">—</div><div class="rs">/1000</div></div>
+                        <div class="rb"><div class="rl">Purity</div><div class="rv" style="color:var(--grn)" id="revPur">—</div><div class="rs">% Au</div></div>
+                        <div class="rb"><div class="rl">Nearest Std</div><div class="rv" style="color:var(--g)" id="revNear">—</div><div class="rs"></div></div>
+                    </div>
+                    <div style="margin-top:10px">
+                        <div class="mm-rl"><span class="mm-k">Water Weight (for your piece)</span><span class="mm-v" style="color:var(--blu)" id="revWW">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">Water Displaced (buoyancy)</span><span class="mm-v" id="revWD">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">Volume</span><span class="mm-v" id="revVol">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">Pure Gold Content</span><span class="mm-v" style="color:var(--grn)" id="revPureG">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">Alloy Content</span><span class="mm-v" style="color:var(--red)" id="revAlloyG">—</span></div>
+                    </div>
+                    <div style="margin-top:10px">
+                        <div class="cd-h" style="padding:6px 10px;border-radius:6px;font-size:.7rem">🧪 Composition Preview</div>
+                        <div id="revComp" style="padding:8px 0"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cd">
+                <div class="cd-h">📋 Full Reference Chart (all karats)</div>
+                <div class="cd-b" style="padding:0">
+                    <table class="wt">
+                        <thead><tr><th>Karat</th><th>Density</th><th>Hallmark</th><th>Purity</th><th>Water Loss (10g)</th></tr></thead>
+                        <tbody id="revChart"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- ─── Alloying Calculator ─── -->
+    <div class="calc-panel" id="cp-alloy" style="display:none">
+    <div class="mg">
+        <div>
+            <div class="cd">
+                <div class="cd-h">⚗️ Alloying Calculator</div>
+                <div class="cd-b">
+                    <div class="ig"><label>Pure Gold You Have</label><input type="number" step="any" id="alWt" value="100" oninput="calcAlloy()"><span class="unit">g</span></div>
+                    <div class="ig"><label>Current Karat (source)</label><input type="number" step="any" id="alFromK" value="24" oninput="calcAlloy()" min="8" max="24"><span class="unit">K</span></div>
+                    <div class="ig"><label>Target Karat (make)</label><input type="number" step="any" id="alToK" value="22" oninput="calcAlloy()" min="8" max="24"><span class="unit">K</span></div>
+                    <div class="ig"><label>Alloy Composition</label>
+                        <select id="alType" onchange="calcAlloy()">
+                            <option value="yellow">🥇 Yellow Gold — 50% Ag + 50% Cu</option>
+                            <option value="rose">🌹 Rose Gold — 100% Cu</option>
+                            <option value="white">⚪ White Gold — 100% Ag (or Ni)</option>
+                            <option value="green">🌿 Green Gold — 100% Ag</option>
+                            <option value="custom">⚙️ Custom Ratio</option>
+                        </select>
+                    </div>
+                    <div class="rw" id="alCustomRow" style="display:none">
+                        <div class="ig"><label>Silver %</label><input type="number" step="any" id="alAgPct" value="50" oninput="calcAlloy()"></div>
+                        <div class="ig"><label>Copper %</label><input type="number" step="any" id="alCuPct" value="50" oninput="calcAlloy()"></div>
+                    </div>
+                    <div class="rw">
+                        <div class="ig"><label>Silver Rate/Tola (PKR)</label><input type="number" step="any" id="alAgRate" value="4500" oninput="calcAlloy()"></div>
+                        <div class="ig"><label>Copper Rate/Kg (PKR)</label><input type="number" step="any" id="alCuRate" value="2500" oninput="calcAlloy()"></div>
+                    </div>
+                    <div class="ig"><label>Melting Loss %</label><input type="number" step="any" id="alLoss" value="1" oninput="calcAlloy()"><span class="unit">%</span></div>
+                    <div style="font-size:.7rem;color:var(--mut);margin-top:8px;padding:8px;background:rgba(212,175,55,.05);border-radius:6px">
+                        💡 Source karat must be HIGHER than target (e.g. 24K → 22K). For refining (up-karating), use Refining Mode below.
+                    </div>
+                </div>
+            </div>
+            <div class="cd">
+                <div class="cd-h">🔬 Refining Mode (up-karat)</div>
+                <div class="cd-b">
+                    <div style="font-size:.7rem;color:var(--mut);margin-bottom:8px">Add PURE gold (24K) to raise karat</div>
+                    <div class="ig"><label>Your Current Piece</label><input type="number" step="any" id="refWt" value="50" oninput="calcRefine()"><span class="unit">g</span></div>
+                    <div class="rw">
+                        <div class="ig"><label>Current Karat</label><input type="number" step="any" id="refFromK" value="18" oninput="calcRefine()"></div>
+                        <div class="ig"><label>Target Karat</label><input type="number" step="any" id="refToK" value="22" oninput="calcRefine()"></div>
+                    </div>
+                    <div style="margin-top:8px;padding:10px;background:rgba(63,185,80,.06);border-radius:8px;border:1px solid var(--grn)">
+                        <div class="mm-rl"><span class="mm-k">Pure Gold to Add</span><span class="mm-v" style="color:var(--grn);font-size:1.1rem" id="refAdd">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">Final Weight</span><span class="mm-v" id="refFinal">—</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="cd">
+                <div class="cd-h">💎 Alloying Result</div>
+                <div class="cd-b">
+                    <div class="det gold-alloy" id="alBan" style="display:block;padding:12px">
+                        <div id="alBanText">Enter values to see result</div>
+                    </div>
+                    <div class="rg" style="grid-template-columns:1fr 1fr;margin-top:10px">
+                        <div class="rb"><div class="rl">Total Alloy Needed</div><div class="rv" style="color:var(--yel)" id="alTotal">—</div><div class="rs">grams</div></div>
+                        <div class="rb"><div class="rl">Final Weight</div><div class="rv" style="color:var(--g)" id="alFinalWt">—</div><div class="rs">grams</div></div>
+                    </div>
+                    <div style="margin-top:12px">
+                        <div class="mm-rl"><span class="mm-k">🥈 Silver to Add</span><span class="mm-v" style="color:#C0C0C0" id="alAg">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">🥉 Copper to Add</span><span class="mm-v" style="color:#CD7F32" id="alCu">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">Melting Loss (~1%)</span><span class="mm-v" style="color:var(--red)" id="alLossG">—</span></div>
+                        <div style="border-top:2px solid var(--g);margin-top:6px;padding-top:6px">
+                            <div class="mm-rl"><span class="mm-k" style="font-size:.9rem">🏆 Yield After Loss</span><span class="mm-v" style="color:var(--g);font-size:1.05rem" id="alYield">—</span></div>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px;padding:10px;background:rgba(88,166,255,.06);border-radius:8px;border:1px solid var(--blu)">
+                        <div class="cd-h" style="padding:0 0 6px 0;font-size:.75rem;color:var(--blu);background:none;border:none">💰 Cost Estimate</div>
+                        <div class="mm-rl"><span class="mm-k">Silver cost</span><span class="mm-v" id="alAgCost">—</span></div>
+                        <div class="mm-rl"><span class="mm-k">Copper cost</span><span class="mm-v" id="alCuCost">—</span></div>
+                        <div class="mm-rl"><span class="mm-k" style="font-weight:700">Total alloy cost</span><span class="mm-v" style="color:var(--yel)" id="alTotalCost">—</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cd">
+                <div class="cd-h">📐 Karat Ratio Reference</div>
+                <div class="cd-b" style="padding:0">
+                    <table class="wt">
+                        <thead><tr><th>From → To</th><th>Alloy per 100g</th><th>Yield</th></tr></thead>
+                        <tbody id="alChart"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- ─── Zakat Calculator ─── -->
+    <div class="calc-panel" id="cp-zakat" style="display:none">
+    <div class="mg">
+        <div>
+            <div class="cd">
+                <div class="cd-h">🕌 Zakat Calculator (Islamic)</div>
+                <div class="cd-b">
+                    <div class="cd-h" style="padding:6px 10px;font-size:.7rem;border-radius:6px;margin-bottom:8px">🥇 Gold Holdings</div>
+                    <div class="rw">
+                        <div class="ig"><label>Gold Weight</label><input type="number" step="any" id="zGoldWt" value="0" oninput="calcZakat()"><span class="unit">g</span></div>
+                        <div class="ig"><label>Karat</label><input type="number" step="any" id="zGoldK" value="22" oninput="calcZakat()"><span class="unit">K</span></div>
+                    </div>
+                    <div class="ig"><label>Gold Rate 24K / Tola (PKR)</label><input type="number" step="any" id="zGoldRate" value="380000" oninput="calcZakat()"></div>
+
+                    <div class="cd-h" style="padding:6px 10px;font-size:.7rem;border-radius:6px;margin:12px 0 8px 0">🥈 Silver Holdings</div>
+                    <div class="rw">
+                        <div class="ig"><label>Silver Weight</label><input type="number" step="any" id="zSilverWt" value="0" oninput="calcZakat()"><span class="unit">g</span></div>
+                        <div class="ig"><label>Purity %</label><input type="number" step="any" id="zSilverPur" value="92.5" oninput="calcZakat()"></div>
+                    </div>
+                    <div class="ig"><label>Silver Rate / Tola (PKR)</label><input type="number" step="any" id="zSilverRate" value="4500" oninput="calcZakat()"></div>
+
+                    <div class="cd-h" style="padding:6px 10px;font-size:.7rem;border-radius:6px;margin:12px 0 8px 0">💵 Other Wealth</div>
+                    <div class="ig"><label>Cash Savings (PKR)</label><input type="number" step="any" id="zCash" value="0" oninput="calcZakat()"></div>
+                    <div class="ig"><label>Trade Goods / Inventory (PKR)</label><input type="number" step="any" id="zTrade" value="0" oninput="calcZakat()"></div>
+                    <div class="ig"><label>Debts Owed to You (receivables)</label><input type="number" step="any" id="zRecv" value="0" oninput="calcZakat()"></div>
+                    <div class="ig"><label>Debts You Owe (deduct)</label><input type="number" step="any" id="zOwed" value="0" oninput="calcZakat()"></div>
+
+                    <div style="margin-top:10px;padding:8px;background:rgba(212,175,55,.05);border-radius:6px;font-size:.7rem;color:var(--mut)">
+                        💡 <b>Nisab thresholds:</b><br>
+                        Gold: 87.48g (7.5 tola) pure gold<br>
+                        Silver: 612.36g (52.5 tola) pure silver<br>
+                        Software uses <b>Silver Nisab</b> (lower, more inclusive — poor's benefit).<br>
+                        <b>Zakat rate: 2.5%</b> if held for 1 lunar (Hijri) year.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="cd">
+                <div class="cd-h">💰 Zakat Calculation Result</div>
+                <div class="cd-b">
+                    <div style="text-align:center;padding:14px;background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(184,134,11,.05));border-radius:10px;margin-bottom:12px">
+                        <div style="font-size:.7rem;color:var(--mut);text-transform:uppercase">Zakat Due</div>
+                        <div style="font-size:2rem;font-weight:900;color:var(--g);margin:4px 0" id="zAmount">PKR 0</div>
+                        <div style="font-size:.7rem;color:var(--mut)" id="zNisabStatus">Enter wealth to calculate</div>
+                    </div>
+
+                    <div class="cd-h" style="padding:6px 10px;font-size:.7rem;border-radius:6px;margin-bottom:6px">📊 Wealth Breakdown</div>
+                    <div class="mm-rl"><span class="mm-k">Pure gold weight</span><span class="mm-v" id="zPureGold">0 g</span></div>
+                    <div class="mm-rl"><span class="mm-k">Gold value</span><span class="mm-v" style="color:var(--g)" id="zGoldVal">PKR 0</span></div>
+                    <div class="mm-rl"><span class="mm-k">Pure silver weight</span><span class="mm-v" id="zPureSilver">0 g</span></div>
+                    <div class="mm-rl"><span class="mm-k">Silver value</span><span class="mm-v" style="color:#C0C0C0" id="zSilverVal">PKR 0</span></div>
+                    <div class="mm-rl"><span class="mm-k">Cash + receivables</span><span class="mm-v" id="zLiquidVal">PKR 0</span></div>
+                    <div class="mm-rl"><span class="mm-k">Debts owed (deduct)</span><span class="mm-v" style="color:var(--red)" id="zDebtVal">PKR 0</span></div>
+                    <div style="border-top:2px solid var(--g);margin-top:6px;padding-top:6px">
+                        <div class="mm-rl"><span class="mm-k" style="font-weight:700;font-size:.9rem">Net Zakatable Wealth</span><span class="mm-v" style="color:var(--yel);font-size:1rem" id="zTotal">PKR 0</span></div>
+                    </div>
+
+                    <div style="margin-top:12px;padding:10px;background:rgba(88,166,255,.06);border-radius:8px;border:1px solid var(--blu)">
+                        <div class="cd-h" style="padding:0 0 6px 0;font-size:.75rem;color:var(--blu);background:none;border:none">🎯 Nisab Check</div>
+                        <div class="mm-rl"><span class="mm-k">Gold Nisab (87.48g)</span><span class="mm-v" id="zNisabGold">PKR 0</span></div>
+                        <div class="mm-rl"><span class="mm-k">Silver Nisab (612.36g)</span><span class="mm-v" id="zNisabSilver">PKR 0</span></div>
+                        <div class="mm-rl"><span class="mm-k">Applied Nisab (lower)</span><span class="mm-v" style="font-weight:700" id="zNisabApplied">PKR 0</span></div>
+                    </div>
+
+                    <div style="margin-top:12px;padding:10px;background:rgba(63,185,80,.06);border-radius:8px;border:1px solid var(--grn);font-size:.72rem;color:var(--gl)" id="zGuidance">
+                        <b>💡 Islamic guidance:</b> Zakat becomes obligatory (Wajib) if wealth ≥ Nisab and has been held for 1 lunar year. Distribute among 8 categories (Fuqara, Masakeen, Aamileen, Muallafat-ul-Quloob, fir-Riqaab, Al-Gharimeen, fi-Sabeelillah, Ibn-us-Sabeel).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 </div>
 
 <!-- ======== HISTORY PANEL ======== -->
@@ -2061,6 +2293,313 @@ function clrJewelry(){
     ['jxPr1','jxPr2','jxPr3'].forEach(id=>st(id,'—'));
     document.getElementById('jxAir').focus();
 }
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULATORS PANEL (Reverse Purity + Alloying + Zakat)
+// ═══════════════════════════════════════════════════════════════
+
+// Sub-tab switcher
+function selCalc(el){
+    document.querySelectorAll('.calc-tab').forEach(b=>{
+        b.style.background='var(--bdr)';
+        b.style.color='var(--txt)';
+    });
+    el.style.background='';el.style.color='';
+    el.classList.add('bg');
+    document.querySelectorAll('.calc-panel').forEach(p=>p.style.display='none');
+    document.getElementById('cp-'+el.dataset.ct).style.display='block';
+    // Trigger re-calc when switching to ensure fresh values
+    if(el.dataset.ct==='rev') calcReverse();
+    else if(el.dataset.ct==='alloy'){ calcAlloy(); calcRefine(); }
+    else if(el.dataset.ct==='zakat') calcZakat();
+}
+
+// ─── REVERSE PURITY CALCULATOR ───
+// Given a karat, compute the expected density and other properties
+function expectedDensity(karat, model){
+    const auFrac = Math.max(0, Math.min(1, karat/24));
+    if(model==='binary_cu'){
+        return 1/(auFrac/MD.Au + (1-auFrac)/MD.Cu);
+    }
+    if(model==='binary_ag'){
+        return 1/(auFrac/MD.Au + (1-auFrac)/MD.Ag);
+    }
+    // Ternary: use same agRatio bucketing as ternaryModel
+    let agR;
+    if(auFrac>0.95) agR=0.5;
+    else if(auFrac>0.85) agR=0.55;
+    else if(auFrac>0.70) agR=0.40;
+    else if(auFrac>0.55) agR=0.30;
+    else agR=0.25;
+    const xAg=(1-auFrac)*agR, xCu=(1-auFrac)*(1-agR);
+    return 1/(auFrac/MD.Au + xAg/MD.Ag + xCu/MD.Cu);
+}
+
+function expectedComposition(karat, model){
+    const auFrac = Math.max(0, Math.min(1, karat/24));
+    if(model==='binary_cu') return {Au:auFrac*100, Ag:0, Cu:(1-auFrac)*100};
+    if(model==='binary_ag') return {Au:auFrac*100, Ag:(1-auFrac)*100, Cu:0};
+    let agR;
+    if(auFrac>0.95) agR=0.5;
+    else if(auFrac>0.85) agR=0.55;
+    else if(auFrac>0.70) agR=0.40;
+    else if(auFrac>0.55) agR=0.30;
+    else agR=0.25;
+    return {Au:auFrac*100, Ag:(1-auFrac)*agR*100, Cu:(1-auFrac)*(1-agR)*100};
+}
+
+function calcReverse(){
+    const k = parseFloat(document.getElementById('revK').value);
+    const wt = parseFloat(document.getElementById('revWt').value) || 10;
+    const model = document.getElementById('revModel').value;
+    if(!k || k<=0 || k>24){
+        ['revDen','revHall','revPur','revNear','revWW','revWD','revVol','revPureG','revAlloyG'].forEach(id=>st(id,'—'));
+        document.getElementById('revComp').innerHTML='<div style="text-align:center;color:var(--mut);padding:10px">Enter valid karat (1-24)</div>';
+        renderRevChart(model);
+        return;
+    }
+    const den = expectedDensity(k, model);
+    const comp = expectedComposition(k, model);
+    const hallmark = (k/24)*1000;
+    const purity = (k/24)*100;
+    const tmp = parseFloat(cfg.tmp)||25;
+    const wd = wDen(tmp);
+    const vol = wt/den;
+    const waterDisp = vol * wd;
+    const waterWt = wt - waterDisp;
+    const pureG = wt * purity/100;
+    const alloyG = wt - pureG;
+
+    st('revDen', den.toFixed(3));
+    st('revHall', hallmark.toFixed(1));
+    st('revPur', purity.toFixed(2)+'%');
+    st('revNear', nearKarat(k));
+    st('revWW', waterWt.toFixed(4)+' g');
+    st('revWD', waterDisp.toFixed(4)+' g');
+    st('revVol', vol.toFixed(4)+' cm³');
+    st('revPureG', pureG.toFixed(3)+' g');
+    st('revAlloyG', alloyG.toFixed(3)+' g');
+
+    // Composition preview
+    const colors={Au:'#FFD700',Ag:'#C0C0C0',Cu:'#CD7F32'};
+    const names={Au:'Gold',Ag:'Silver',Cu:'Copper'};
+    let compHTML = '';
+    for(const [sym,pct] of Object.entries(comp)){
+        if(pct<0.01) continue;
+        const gm = wt*(pct/100);
+        compHTML += `<div class="ci"><div class="ci-top"><span class="ci-nm" style="color:${colors[sym]}">${names[sym]}</span><span class="ci-vl"><b>${pct.toFixed(2)}%</b> · ${gm.toFixed(3)} g</span></div><div class="ci-bar"><div class="ci-fill" style="width:${Math.min(100,pct)}%;background:${colors[sym]}"></div></div></div>`;
+    }
+    document.getElementById('revComp').innerHTML = compHTML;
+
+    renderRevChart(model);
+}
+
+function renderRevChart(model){
+    const karats=[24,23,22,21,20,18,16,14,12,10,9,8];
+    const tmp=parseFloat(cfg.tmp)||25;
+    const wd=wDen(tmp);
+    let html='';
+    for(const k of karats){
+        const d=expectedDensity(k, model);
+        const hall=(k/24)*1000;
+        const pur=(k/24)*100;
+        const waterLoss=(10/d)*wd;
+        html+=`<tr><td class="wl" style="color:var(--g);font-weight:700">${k}K</td><td>${d.toFixed(3)}</td><td>${hall.toFixed(0)}</td><td>${pur.toFixed(1)}%</td><td>${waterLoss.toFixed(4)}g</td></tr>`;
+    }
+    // Add silver too
+    html+=`<tr><td class="wl" style="color:#C0C0C0;font-weight:700">Silver 999</td><td>${MD.Ag.toFixed(3)}</td><td>999</td><td>99.9%</td><td>${((10/MD.Ag)*wd).toFixed(4)}g</td></tr>`;
+    html+=`<tr><td class="wl" style="color:#C0C0C0;font-weight:700">Sterling 925</td><td>10.36</td><td>925</td><td>92.5%</td><td>${((10/10.36)*wd).toFixed(4)}g</td></tr>`;
+    document.getElementById('revChart').innerHTML=html;
+}
+
+// ─── ALLOYING CALCULATOR ───
+function calcAlloy(){
+    const wt = parseFloat(document.getElementById('alWt').value);
+    const fromK = parseFloat(document.getElementById('alFromK').value);
+    const toK = parseFloat(document.getElementById('alToK').value);
+    const type = document.getElementById('alType').value;
+    const lossPct = parseFloat(document.getElementById('alLoss').value) || 0;
+    const agRate = parseFloat(document.getElementById('alAgRate').value) || 0;
+    const cuRate = parseFloat(document.getElementById('alCuRate').value) || 0;
+
+    // Show/hide custom row
+    document.getElementById('alCustomRow').style.display = type==='custom' ? 'flex' : 'none';
+
+    const ban = document.getElementById('alBanText');
+    if(!wt || !fromK || !toK || fromK<=0 || toK<=0){
+        ban.innerHTML='<span style="color:var(--mut)">Enter all values</span>';
+        ['alTotal','alFinalWt','alAg','alCu','alLossG','alYield','alAgCost','alCuCost','alTotalCost'].forEach(id=>st(id,'—'));
+        renderAlloyChart();
+        return;
+    }
+    if(toK >= fromK){
+        ban.innerHTML='<span style="color:var(--red)">⚠️ Target karat must be LOWER than source (this is alloying, not refining). Use Refining Mode for up-karat.</span>';
+        ['alTotal','alFinalWt','alAg','alCu','alLossG','alYield','alAgCost','alCuCost','alTotalCost'].forEach(id=>st(id,'—'));
+        renderAlloyChart();
+        return;
+    }
+
+    // Core formula: alloy = wt × (fromK − toK) / toK  (assumes source is pure at claimed fromK)
+    // If fromK=24 and wt=100g, target=22K → alloy = 100 × 2/22 = 9.09g
+    // Adjusted: source's actual pure gold content = wt × (fromK/24)
+    const pureGold = wt * (fromK/24);
+    // Total final weight needed so that pureGold/finalWt = toK/24
+    const finalWtRequired = pureGold * (24/toK);
+    const alloyTotal = finalWtRequired - wt;
+
+    let agPct, cuPct;
+    if(type==='yellow'){ agPct=50; cuPct=50; }
+    else if(type==='rose'){ agPct=0; cuPct=100; }
+    else if(type==='white'){ agPct=100; cuPct=0; }
+    else if(type==='green'){ agPct=100; cuPct=0; }
+    else{
+        agPct = parseFloat(document.getElementById('alAgPct').value) || 0;
+        cuPct = parseFloat(document.getElementById('alCuPct').value) || 0;
+        const sum = agPct + cuPct;
+        if(sum > 0){ agPct = agPct/sum*100; cuPct = cuPct/sum*100; }
+    }
+
+    const agAdd = alloyTotal * (agPct/100);
+    const cuAdd = alloyTotal * (cuPct/100);
+    const lossG = finalWtRequired * (lossPct/100);
+    const yieldWt = finalWtRequired - lossG;
+
+    // Costs
+    const agCost = (agAdd/TOLA) * agRate;
+    const cuCost = (cuAdd/1000) * cuRate;
+    const totalCost = agCost + cuCost;
+
+    ban.className = 'det gold-alloy';
+    ban.innerHTML = `✨ Convert <b>${wt}g of ${fromK}K</b> → <b>${finalWtRequired.toFixed(2)}g of ${toK}K</b>`;
+
+    st('alTotal', alloyTotal.toFixed(3));
+    st('alFinalWt', finalWtRequired.toFixed(3));
+    st('alAg', agAdd.toFixed(3)+' g');
+    st('alCu', cuAdd.toFixed(3)+' g');
+    st('alLossG', lossG.toFixed(3)+' g');
+    st('alYield', yieldWt.toFixed(3)+' g');
+    st('alAgCost', 'PKR '+fm(agCost));
+    st('alCuCost', 'PKR '+fm(cuCost));
+    st('alTotalCost', 'PKR '+fm(totalCost));
+
+    renderAlloyChart();
+}
+
+function renderAlloyChart(){
+    // Show common conversions for 100g source
+    const scenarios=[
+        {from:24,to:22},{from:24,to:21},{from:24,to:20},{from:24,to:18},
+        {from:24,to:14},{from:22,to:18},{from:22,to:14},{from:18,to:14},
+    ];
+    let html='';
+    for(const s of scenarios){
+        const pure = 100 * (s.from/24);
+        const final = pure * (24/s.to);
+        const alloy = final - 100;
+        html+=`<tr><td class="wl">${s.from}K → ${s.to}K</td><td>${alloy.toFixed(2)}g</td><td>${final.toFixed(2)}g</td></tr>`;
+    }
+    document.getElementById('alChart').innerHTML=html;
+}
+
+// ─── REFINING (up-karat) ───
+function calcRefine(){
+    const wt = parseFloat(document.getElementById('refWt').value);
+    const fromK = parseFloat(document.getElementById('refFromK').value);
+    const toK = parseFloat(document.getElementById('refToK').value);
+    if(!wt || !fromK || !toK || fromK<=0 || toK<=0 || toK<=fromK || toK>24){
+        st('refAdd', '—');
+        st('refFinal', '—');
+        return;
+    }
+    // Current pure gold in piece
+    const currentPure = wt * (fromK/24);
+    // After adding x grams of 24K: total pure = currentPure + x, total weight = wt + x
+    // Target karat: (currentPure + x) / (wt + x) = toK/24
+    // Solve for x: 24(currentPure + x) = toK(wt + x)
+    //              24*currentPure + 24x = toK*wt + toK*x
+    //              x(24 - toK) = toK*wt - 24*currentPure
+    //              x = (toK*wt - 24*currentPure) / (24 - toK)
+    const x = (toK*wt - 24*currentPure) / (24 - toK);
+    st('refAdd', x.toFixed(3)+' g of 24K');
+    st('refFinal', (wt+x).toFixed(3)+' g of '+toK+'K');
+}
+
+// ─── ZAKAT CALCULATOR ───
+// Islamic ruling: Zakat = 2.5% of wealth ≥ Nisab held for 1 lunar year
+// Gold Nisab: 87.48g pure gold  |  Silver Nisab: 612.36g pure silver
+// Use lower Nisab (silver) for maximum inclusion of poor
+const NISAB_GOLD = 87.48;    // grams pure gold
+const NISAB_SILVER = 612.36; // grams pure silver
+const ZAKAT_RATE = 0.025;    // 2.5%
+
+function calcZakat(){
+    const goldWt = parseFloat(document.getElementById('zGoldWt').value) || 0;
+    const goldK = parseFloat(document.getElementById('zGoldK').value) || 24;
+    const goldRate = parseFloat(document.getElementById('zGoldRate').value) || 0;
+    const silverWt = parseFloat(document.getElementById('zSilverWt').value) || 0;
+    const silverPur = parseFloat(document.getElementById('zSilverPur').value) || 100;
+    const silverRate = parseFloat(document.getElementById('zSilverRate').value) || 0;
+    const cash = parseFloat(document.getElementById('zCash').value) || 0;
+    const trade = parseFloat(document.getElementById('zTrade').value) || 0;
+    const recv = parseFloat(document.getElementById('zRecv').value) || 0;
+    const owed = parseFloat(document.getElementById('zOwed').value) || 0;
+
+    // Convert holdings to pure metal
+    const pureGold = goldWt * (goldK/24);
+    const pureSilver = silverWt * (silverPur/100);
+
+    // Values
+    const goldValue = (pureGold / (TOLA)) * goldRate;  // Rate is per tola of pure gold
+    const silverValue = (pureSilver / TOLA) * silverRate;
+    const liquid = cash + trade + recv;
+    const debts = owed;
+    const totalWealth = goldValue + silverValue + liquid - debts;
+
+    // Nisab values in PKR
+    const nisabGoldPKR = (NISAB_GOLD / TOLA) * goldRate;
+    const nisabSilverPKR = (NISAB_SILVER / TOLA) * silverRate;
+    // Use the lower Nisab (silver — more inclusive; helps poor)
+    const nisabApplied = Math.min(nisabGoldPKR, nisabSilverPKR);
+
+    // Zakat due
+    const meetsNisab = totalWealth >= nisabApplied && totalWealth > 0;
+    const zakatDue = meetsNisab ? totalWealth * ZAKAT_RATE : 0;
+
+    // Update UI
+    st('zPureGold', pureGold.toFixed(3)+' g');
+    st('zGoldVal', 'PKR '+fm(goldValue));
+    st('zPureSilver', pureSilver.toFixed(3)+' g');
+    st('zSilverVal', 'PKR '+fm(silverValue));
+    st('zLiquidVal', 'PKR '+fm(liquid));
+    st('zDebtVal', 'PKR '+fm(debts));
+    st('zTotal', 'PKR '+fm(totalWealth));
+    st('zNisabGold', 'PKR '+fm(nisabGoldPKR));
+    st('zNisabSilver', 'PKR '+fm(nisabSilverPKR));
+    st('zNisabApplied', 'PKR '+fm(nisabApplied)+(nisabApplied===nisabSilverPKR?' (silver-based)':' (gold-based)'));
+
+    st('zAmount', 'PKR '+fm(zakatDue));
+
+    const statusEl = document.getElementById('zNisabStatus');
+    if(totalWealth <= 0){
+        statusEl.textContent='Enter wealth to calculate';
+        statusEl.style.color='var(--mut)';
+    } else if(meetsNisab){
+        statusEl.textContent=`✅ Exceeds Nisab — Zakat obligatory (2.5%)`;
+        statusEl.style.color='var(--grn)';
+    } else {
+        statusEl.textContent=`⚠️ Below Nisab — No Zakat due (need at least PKR ${fm(nisabApplied)})`;
+        statusEl.style.color='var(--yel)';
+    }
+}
+
+// Initialize calculators on load
+document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{
+        if(document.getElementById('revChart')) calcReverse();
+        if(document.getElementById('alChart')){ calcAlloy(); calcRefine(); }
+        if(document.getElementById('zAmount')) calcZakat();
+    },100);
+});
 
 // ═══ AUTO-RATE BY METAL TYPE ═══
 function getAutoRate(det){
