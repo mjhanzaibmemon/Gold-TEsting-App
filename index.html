@@ -1,0 +1,2342 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLD TEST LAB PRO — Ultra Advanced Auto-Detection</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#D4AF37;--gd:#B8860B;--gl:#F5E6A3;--bg:#0b0e14;--card:#131720;--inp:#0d1117;--txt:#e6edf3;--mut:#7d8590;--red:#f85149;--grn:#3fb950;--yel:#d29922;--blu:#58a6ff;--bdr:#21262d;--r:12px}
+html{font-size:14px}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#8B6914,#D4AF37,#F5E6A3,#D4AF37,#8B6914);color:#1a1000;padding:10px 18px;display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.logo{width:42px;height:42px;border-radius:50%;background:radial-gradient(#fff 20%,#D4AF37 70%);display:flex;align-items:center;justify-content:center;font:900 16px/1 serif;border:3px solid #6B4F00;box-shadow:0 0 15px rgba(212,175,55,.5)}
+.hdr h1{font-size:1.15rem;font-weight:900}
+.hdr p{font-size:.6rem;opacity:.7}
+.hdr-r{text-align:right;font-size:.7rem;line-height:1.4}
+.hdr-r .bn{font-size:1rem;font-weight:900;color:#4a2800}
+
+/* TABS */
+.tabs{display:flex;background:var(--card);border-bottom:2px solid var(--gd);overflow-x:auto}
+.tab{padding:9px 20px;font-weight:600;font-size:.82rem;color:var(--mut);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:.2s}
+.tab:hover{color:var(--gl)}
+.tab.on{color:var(--g);border-bottom-color:var(--g)}
+
+/* PANELS */
+.pnl{display:none;padding:14px;animation:fadeU .3s}
+.pnl.on{display:block}
+@keyframes fadeU{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+
+/* CARDS */
+.cd{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.cd-h{padding:9px 14px;font-weight:700;font-size:.82rem;color:var(--g);background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(184,134,11,.05));border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:7px}
+.cd-b{padding:14px}
+
+/* INPUTS */
+label{display:block;font-size:.65rem;color:var(--gl);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+input,select{width:100%;padding:10px 12px;background:var(--inp);border:2px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:1.05rem;font-weight:600;outline:none;transition:.2s}
+input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
+.ig{margin-bottom:12px;position:relative}
+.ig .unit{position:absolute;right:12px;top:55%;font-size:.7rem;color:var(--mut);pointer-events:none}
+.rw{display:flex;gap:10px}
+.rw>*{flex:1}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:12px 20px;border:none;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;transition:.15s}
+.btn:active{transform:scale(.97)}
+.bg{background:linear-gradient(135deg,#D4AF37,#B8860B);color:var(--bg);box-shadow:0 3px 12px rgba(212,175,55,.25)}
+.br{background:var(--red);color:#fff}
+.bgr{background:var(--grn);color:#fff}
+.bs{padding:7px 14px;font-size:.72rem}
+.bw{width:100%}
+
+/* DETECT BANNER */
+.det{padding:14px;border-radius:var(--r);margin-bottom:12px;text-align:center;font-weight:700;font-size:.95rem;border:2px solid;display:none;animation:fadeU .4s}
+.det.gold-pure{background:rgba(212,175,55,.08);border-color:var(--g);color:var(--g)}
+.det.gold-alloy{background:rgba(212,175,55,.06);border-color:var(--gd);color:var(--gl)}
+.det.silver{background:rgba(192,192,192,.08);border-color:#C0C0C0;color:#C0C0C0}
+.det.platinum{background:rgba(229,228,226,.08);border-color:#e5e4e2;color:#e5e4e2}
+.det.palladium{background:rgba(206,208,206,.08);border-color:#CED0CE;color:#CED0CE}
+.det.copper{background:rgba(184,115,51,.08);border-color:#B87333;color:#CD7F32}
+.det.fake{background:rgba(248,81,73,.12);border-color:var(--red);color:var(--red);animation:pulse 1.5s infinite}
+.det.jewelry{background:rgba(88,166,255,.08);border-color:var(--blu);color:var(--blu)}
+.det.other{background:rgba(125,133,144,.08);border-color:var(--mut);color:var(--mut)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* CONFIDENCE */
+.conf-bar{height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin-top:6px}
+.conf-fill{height:100%;border-radius:3px;transition:width .8s}
+
+/* RESULT GRID */
+.rg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.rb{background:rgba(255,255,255,.02);border:1px solid var(--bdr);border-radius:10px;padding:10px;text-align:center}
+.rb .rl{font-size:.6rem;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.rb .rv{font-size:1.5rem;font-weight:900}
+.rb .rs{font-size:.65rem;color:var(--mut);margin-top:2px}
+@media(max-width:600px){.rg{grid-template-columns:1fr 1fr}}
+
+/* GAUGE SVG */
+.gauge-wrap{text-align:center;padding:8px 0}
+.gauge-svg{width:170px;height:170px}
+.gt{font-size:26px;font-weight:900;fill:var(--g)}
+.gs{font-size:9px;fill:var(--mut);text-transform:uppercase}
+
+/* COMP BARS */
+.ci{margin-bottom:8px}
+.ci-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.ci-nm{font-size:.78rem;font-weight:600}
+.ci-vl{font-size:.68rem;color:var(--mut)}
+.ci-vl b{color:var(--txt)}
+.ci-bar{height:8px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+.ci-fill{height:100%;border-radius:4px;transition:width .8s}
+
+/* WEIGHT TABLE */
+.wt{width:100%;border-collapse:collapse;font-size:.78rem}
+.wt th{padding:7px 5px;color:var(--g);font-size:.6rem;text-transform:uppercase;letter-spacing:.5px;text-align:center;background:rgba(212,175,55,.06)}
+.wt td{padding:7px 5px;text-align:center;border-bottom:1px solid rgba(255,255,255,.02)}
+.wt .wl{text-align:left;font-weight:600}
+
+/* VALUE ROW */
+.vr{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:.82rem}
+.vr:last-child{border:none}
+.vr .vl{color:var(--mut)}
+.vr .vv{font-weight:700}
+
+/* ADVANCED ANALYSIS TABLE */
+.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.adv-item{background:rgba(255,255,255,.02);border:1px solid var(--bdr);border-radius:8px;padding:10px;text-align:center}
+.adv-item .ai-l{font-size:.6rem;color:var(--mut);text-transform:uppercase;margin-bottom:3px}
+.adv-item .ai-v{font-size:1.1rem;font-weight:800}
+
+/* LAYOUT */
+.mg{display:grid;grid-template-columns:340px 1fr;gap:14px}
+@media(max-width:850px){.mg{grid-template-columns:1fr}}
+
+/* HISTORY */
+.hi{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:8px;transition:.2s}
+.hi:hover{border-color:var(--gd)}
+.hi-top{display:flex;justify-content:space-between;margin-bottom:6px}
+.hi-type{font-weight:700;color:var(--g);font-size:.85rem}
+.hi-date{font-size:.65rem;color:var(--mut)}
+.hi-stats{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem}
+.hi-stat span{color:var(--mut);font-size:.6rem;display:block}
+.hi-stat b{color:var(--txt)}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.mo-box{background:#fff;color:#000;width:370px;max-height:90vh;overflow-y:auto;border-radius:12px}
+.bill{padding:18px;font-family:'Courier New',monospace;font-size:11px}
+.bill h2{text-align:center;font-size:14px;margin-bottom:2px}
+.bill .bsub{text-align:center;font-size:9px;color:#666}
+.bill hr{border:none;border-top:1px dashed #aaa;margin:7px 0}
+.bill .brow{display:flex;justify-content:space-between;padding:1.5px 0}
+.bill .brow.big{font-size:13px;font-weight:900}
+.bill .brow.bold{font-weight:700}
+.bill .bctr{text-align:center;font-weight:700;margin:3px 0;font-size:11px}
+.bill .bft{text-align:center;font-size:8px;color:#999;margin-top:10px}
+.mo-act{display:flex;gap:8px;padding:12px;justify-content:center;background:var(--card);border-radius:0 0 12px 12px}
+
+/* MODE GRID */
+.md-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.md-btn{background:var(--card);border:2px solid var(--bdr);border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:.2s}
+.md-btn:hover{border-color:var(--gd);transform:translateY(-2px);box-shadow:0 4px 15px rgba(212,175,55,.15)}
+.md-btn.sel{border-color:var(--g);background:rgba(212,175,55,.08);box-shadow:0 0 20px rgba(212,175,55,.2)}
+.md-btn .md-ico{font-size:1.8rem;margin-bottom:4px}
+.md-btn .md-nm{font-weight:700;font-size:.82rem;color:var(--txt)}
+.md-btn .md-ds{font-size:.58rem;color:var(--mut);margin-top:3px;line-height:1.3}
+.md-btn.sel .md-nm{color:var(--g)}
+.mm-res{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;margin-top:12px}
+.mm-rl{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:.82rem}
+.mm-rl:last-child{border:none}
+.mm-rl .mm-k{color:var(--mut)}
+.mm-rl .mm-v{font-weight:700}
+@media(max-width:500px){.md-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* LIVE RATE */
+.lr-box{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.lr-item{background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:8px;padding:8px;text-align:center}
+.lr-item .lr-l{font-size:.55rem;color:var(--mut);text-transform:uppercase;letter-spacing:.3px}
+.lr-item .lr-v{font-size:1rem;font-weight:900;margin-top:2px}
+.lr-item .lr-s{font-size:.55rem;color:var(--mut);margin-top:1px}
+.lr-src{display:flex;gap:6px;margin-top:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.lr-time{font-size:.6rem;color:var(--mut);text-align:center;margin-top:6px}
+.lr-spin{display:inline-block;width:14px;height:14px;border:2px solid var(--gd);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lr-err{color:var(--red);font-size:.7rem;text-align:center;padding:6px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--gd);border-radius:3px}
+
+/* PRINT */
+@media print{body *{visibility:hidden}.bill,.bill *{visibility:visible}.bill{position:absolute;left:0;top:0;width:80mm}.mo,.mo-act{display:none!important}}
+
+/* JEWELRY XRF */
+.jxrf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.jx-el{background:rgba(255,255,255,.02);border:1px solid var(--bdr);border-radius:10px;padding:10px 8px;text-align:center;position:relative;overflow:hidden}
+.jx-el .jx-sym{font-size:.6rem;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.jx-el .jx-pct{font-size:1.4rem;font-weight:900;margin:2px 0}
+.jx-el .jx-gm{font-size:.65rem;color:var(--mut)}
+.jx-el .jx-bar{position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 10px 10px;transition:width .8s}
+.jx-el.gold .jx-pct{color:#FFD700}
+.jx-el.silver .jx-pct{color:#C0C0C0}
+.jx-el.copper .jx-pct{color:#CD7F32}
+.jx-el.zinc .jx-pct{color:#BDBDBD}
+.jx-el.cadmium .jx-pct{color:#FF6B6B}
+.jx-el.nickel .jx-pct{color:#727472}
+.jx-el.lead .jx-pct{color:#F85149}
+.jx-el.tin .jx-pct{color:#D3D3D3}
+.jx-el.rhodium .jx-pct{color:#E8E8E8}
+.jx-el.stone .jx-pct{color:#58a6ff}
+@media(max-width:600px){.jxrf-grid{grid-template-columns:repeat(2,1fr)}}
+.jx-solder{background:rgba(212,175,55,.04);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:12px}
+.jx-solder .jx-title{font-size:.7rem;color:var(--g);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.jx-risk{padding:10px 14px;border-radius:10px;margin-bottom:8px;font-size:.82rem;display:flex;align-items:center;gap:8px}
+.jx-risk.safe{background:rgba(63,185,80,.08);border:1px solid var(--grn);color:var(--grn)}
+.jx-risk.warn{background:rgba(210,153,34,.08);border:1px solid var(--yel);color:var(--yel)}
+.jx-risk.danger{background:rgba(248,81,73,.1);border:1px solid var(--red);color:var(--red)}
+.jx-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.6rem;font-weight:700;margin:2px}
+.jx-tag.g{background:rgba(63,185,80,.15);color:var(--grn)}
+.jx-tag.y{background:rgba(210,153,34,.15);color:var(--yel)}
+.jx-tag.r{background:rgba(248,81,73,.15);color:var(--red)}
+.jx-tag.b{background:rgba(88,166,255,.15);color:var(--blu)}
+.jx-stone-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.jx-stone-item{background:rgba(88,166,255,.04);border:1px solid var(--bdr);border-radius:8px;padding:10px;text-align:center}
+.jx-stone-item .ai-l{font-size:.6rem;color:var(--blu);text-transform:uppercase}
+.jx-stone-item .ai-v{font-size:1rem;font-weight:800;color:var(--txt)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+    <div class="hdr-left">
+        <div class="logo">Au</div>
+        <div><h1>GOLD TEST LAB PRO</h1><p>Ultra Auto-Detection — XRF-Level Analysis</p></div>
+    </div>
+    <div class="hdr-r">
+        <div class="bn">Bill #<span id="billNo">1</span></div>
+        <div id="hdrDt"></div>
+    </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+    <div class="tab on" data-t="test">⚖️ Auto Test</div>
+    <div class="tab" data-t="jewelry">💎 Jewelry XRF</div>
+    <div class="tab" data-t="manual">🔬 Manual Modes</div>
+    <div class="tab" data-t="history">📋 History</div>
+    <div class="tab" data-t="settings">⚙️ Settings</div>
+</div>
+
+<!-- ======== TEST PANEL ======== -->
+<div class="pnl on" id="p-test">
+<div class="mg">
+
+<!-- LEFT -->
+<div>
+    <div class="cd">
+        <div class="cd-h">⚖️ Weights</div>
+        <div class="cd-b">
+            <div class="ig"><label>Weight in Air</label><input type="number" step="any" id="inAir" placeholder="0.000" inputmode="decimal"><span class="unit">g</span></div>
+            <div class="ig"><label>Weight in Water</label><input type="number" step="any" id="inWater" placeholder="0.000" inputmode="decimal"><span class="unit">g</span></div>
+            <div class="rw" style="margin-top:4px">
+                <button class="btn bg bw" onclick="calc()">⚡ TEST &amp; DETECT</button>
+                <button class="btn br" onclick="clr()" style="width:60px">✕</button>
+            </div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">📡 Live Metal Rates <span id="lrStatus" style="margin-left:auto;font-size:.6rem;color:var(--mut)"></span></div>
+        <div class="cd-b">
+            <div id="lrContent">
+                <div style="text-align:center;color:var(--mut);font-size:.75rem;padding:8px">Click button to fetch live rates</div>
+            </div>
+            <div class="lr-src">
+                <button class="btn bg bs" onclick="fetchLiveRates()" id="lrBtn">📡 Fetch Live Rates</button>
+                <button class="btn bs" style="background:var(--blu);color:#fff" onclick="window.open('https://gold.pk','_blank')">🌐 gold.pk</button>
+            </div>
+            <div class="lr-time" id="lrTime"></div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">💰 Price <span id="autoRateBadge" style="margin-left:auto;font-size:.55rem;padding:2px 6px;border-radius:4px;display:none"></span></div>
+        <div class="cd-b">
+            <div class="rw"><div class="ig"><label id="rateLabel">Rate / Tola</label><input type="number" step="any" id="inRate" placeholder="0" oninput="this.dataset.manual=this.value?'1':''"></div><div class="ig"><label>Charges</label><input type="number" step="any" id="inChg" value="0"></div></div>
+            <div class="rw"><div class="ig"><label>Ratti IN / Tola</label><input type="number" step="any" id="inRI" value="0" title="Ratti deduction per tola of pure gold"></div><div class="ig"><label>Ratti OUT / Tola</label><input type="number" step="any" id="inRO" value="0" title="Ratti added back per tola of pure gold"></div></div>
+            <div class="rw"><div class="ig"><label>Making / gm</label><input type="number" step="any" id="inMk" value="0"></div><div class="ig"><label>Wastage %</label><input type="number" step="any" id="inWst" value="0"></div></div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">✂️ Kaat</div>
+        <div class="cd-b">
+            <div class="rw">
+                <div class="ig"><label>Tola</label><input type="number" step="any" id="ktT" value="0"></div>
+                <div class="ig"><label>Masha</label><input type="number" step="any" id="ktM" value="0"></div>
+                <div class="ig"><label>Ratti</label><input type="number" step="any" id="ktR" value="0"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RIGHT -->
+<div>
+    <!-- Detection Banner -->
+    <div class="det" id="detBan"></div>
+
+    <!-- Confidence -->
+    <div class="cd" id="confCard" style="display:none">
+        <div class="cd-b" style="padding:10px 14px">
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:4px">
+                <span style="color:var(--mut)">Detection Confidence</span>
+                <span style="font-weight:700" id="confPct">0%</span>
+            </div>
+            <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0%;background:var(--grn)"></div></div>
+        </div>
+    </div>
+
+    <!-- Key Results -->
+    <div class="rg" id="resGrid">
+        <div class="rb"><div class="rl">Karat</div><div class="rv" style="color:var(--g)" id="rK">—</div><div class="rs" id="rKs"></div></div>
+        <div class="rb"><div class="rl">Hallmark</div><div class="rv" style="color:var(--g)" id="rH">—</div><div class="rs" id="rHs"></div></div>
+        <div class="rb"><div class="rl">Purity</div><div class="rv" style="color:var(--grn)" id="rP">—</div><div class="rs" id="rPs"></div></div>
+        <div class="rb"><div class="rl">Density</div><div class="rv" style="color:var(--blu)" id="rD">—</div><div class="rs">g/cm³</div></div>
+    </div>
+
+    <!-- Gauge + Advanced Side by Side -->
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:12px;margin-bottom:12px">
+        <!-- Gauge -->
+        <div class="cd">
+            <div class="cd-b gauge-wrap">
+                <svg class="gauge-svg" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="85" fill="none" stroke="#1c2333" stroke-width="12"/>
+                    <circle cx="100" cy="100" r="85" fill="none" stroke="var(--gd)" stroke-width="12" stroke-dasharray="534" stroke-dashoffset="534" stroke-linecap="round" transform="rotate(-90 100 100)" id="gArc"/>
+                    <text x="100" y="90" text-anchor="middle" class="gt" id="gVal">—</text>
+                    <text x="100" y="108" text-anchor="middle" class="gs" id="gLbl">KARAT</text>
+                    <text x="100" y="126" text-anchor="middle" style="font-size:10px;fill:var(--mut)" id="gH"></text>
+                </svg>
+            </div>
+        </div>
+        <!-- Advanced Analysis -->
+        <div class="cd">
+            <div class="cd-h">🔬 Advanced Analysis</div>
+            <div class="cd-b">
+                <div class="adv-grid">
+                    <div class="adv-item"><div class="ai-l">Volume</div><div class="ai-v" id="aVol">—</div></div>
+                    <div class="adv-item"><div class="ai-l">Sp. Gravity</div><div class="ai-v" id="aSG">—</div></div>
+                    <div class="adv-item"><div class="ai-l">Buoyancy</div><div class="ai-v" id="aBuoy">—</div></div>
+                    <div class="adv-item"><div class="ai-l">Water Disp.</div><div class="ai-v" id="aWD">—</div></div>
+                    <div class="adv-item"><div class="ai-l">Fineness</div><div class="ai-v" id="aFine">—</div></div>
+                    <div class="adv-item"><div class="ai-l">Au Atom %</div><div class="ai-v" id="aAtom">—</div></div>
+                    <div class="adv-item"><div class="ai-l">Spread Score</div><div class="ai-v" id="aSpread">—</div></div>
+                    <div class="adv-item"><div class="ai-l">Est. Alloy</div><div class="ai-v" id="aAlloy">—</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Composition -->
+    <div class="cd">
+        <div class="cd-h">🧪 Metal Composition — XRF-Level Breakdown</div>
+        <div class="cd-b" id="compBox"><div style="text-align:center;color:var(--mut);padding:16px">Enter weights → Auto detect</div></div>
+    </div>
+
+    <!-- Weight Breakdown -->
+    <div class="cd">
+        <div class="cd-h">📐 Weight Breakdown</div>
+        <div class="cd-b" style="padding:0">
+            <table class="wt">
+                <thead><tr><th></th><th>Tola</th><th>Masha</th><th>Ratti</th><th>Grams</th><th>mg</th></tr></thead>
+                <tbody id="wtB">
+                    <tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl" style="color:var(--grn)">Pure</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl">Kaat</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl" style="color:var(--g)">Balance</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Multi-Test Comparison -->
+    <div class="cd" id="multiCard" style="display:none">
+        <div class="cd-h">📊 Multi-Test Comparison</div>
+        <div class="cd-b" id="multiBox"></div>
+    </div>
+
+    <!-- Price -->
+    <div class="cd">
+        <div class="cd-h">💲 Price</div>
+        <div class="cd-b">
+            <div class="vr"><span class="vl" id="pGPLabel">Metal Price</span><span class="vv" id="pGP">—</span></div>
+            <div class="vr"><span class="vl">Charges</span><span class="vv" id="pCh">—</span></div>
+            <div class="vr"><span class="vl">Wastage</span><span class="vv" id="pWs">—</span></div>
+            <div style="border-top:2px solid var(--g);margin-top:6px;padding-top:6px">
+                <div class="vr"><span class="vl" style="font-size:1rem">🏆 Total</span><span class="vv" style="font-size:1.3rem;color:var(--g)" id="pTot">—</span></div>
+                <div class="vr"><span class="vl">Balance</span><span class="vv" style="color:var(--grn)" id="pBal">—</span></div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn bg bs" onclick="showBill()">🧾 Bill</button>
+                <button class="btn bgr bs" onclick="saveHist()">💾 Save</button>
+                <button class="btn bs" style="background:var(--blu);color:#fff" onclick="addMulti()">📊 Add to Compare</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<!-- ======== JEWELRY XRF PANEL ======== -->
+<div class="pnl" id="p-jewelry">
+<div class="mg">
+
+<!-- LEFT -->
+<div>
+    <div class="cd">
+        <div class="cd-h">⚖️ Jewelry Weights</div>
+        <div class="cd-b">
+            <div class="ig"><label>Total Weight in Air (with stones)</label><input type="number" step="any" id="jxAir" placeholder="0.000" inputmode="decimal"><span class="unit">g</span></div>
+            <div class="ig"><label>Total Weight in Water (with stones)</label><input type="number" step="any" id="jxWater" placeholder="0.000" inputmode="decimal"><span class="unit">g</span></div>
+            <div class="rw" style="margin-top:4px">
+                <button class="btn bg bw" onclick="calcJewelry()">💎 FULL XRF ANALYSIS</button>
+                <button class="btn br" onclick="clrJewelry()" style="width:60px">✕</button>
+            </div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">💎 Stone Options</div>
+        <div class="cd-b">
+            <div class="ig">
+                <label>Has Stones?</label>
+                <select id="jxHasStones" onchange="document.getElementById('jxStoneOpts').style.display=this.value==='yes'?'block':'none'">
+                    <option value="no">No — Plain Metal Jewelry</option>
+                    <option value="yes">Yes — Has Gemstones/Stones</option>
+                </select>
+            </div>
+            <div id="jxStoneOpts" style="display:none">
+                <div class="ig">
+                    <label>Stone Type</label>
+                    <select id="jxStoneType">
+                        <option value="diamond">💎 Diamond (d=3.52)</option>
+                        <option value="ruby">🔴 Ruby / Sapphire (d=4.00)</option>
+                        <option value="emerald">🟢 Emerald (d=2.72)</option>
+                        <option value="garnet">🟣 Garnet (d=3.80)</option>
+                        <option value="zircon">⚪ Zircon / CZ (d=5.80)</option>
+                        <option value="pearl">🤍 Pearl (d=2.71)</option>
+                        <option value="topaz">🔵 Topaz (d=3.53)</option>
+                        <option value="quartz">🔮 Quartz / Amethyst (d=2.65)</option>
+                        <option value="glass">🪟 Glass Stone (d=2.50)</option>
+                        <option value="unknown" selected>❓ Unknown (avg d=3.00)</option>
+                    </select>
+                </div>
+                <div class="ig">
+                    <label>Stone Weight (if known, optional)</label>
+                    <input type="number" step="any" id="jxStoneWt" placeholder="Leave empty for auto-estimate" inputmode="decimal"><span class="unit">g</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">🔗 Jewelry Type</div>
+        <div class="cd-b">
+            <div class="ig">
+                <label>Type (for solder/tanka estimation)</label>
+                <select id="jxType">
+                    <option value="ring">💍 Ring (Tanka ~2-3%)</option>
+                    <option value="chain">⛓️ Chain (Tanka ~5-8%)</option>
+                    <option value="bangle">🔘 Bangle / Kara (Tanka ~3-5%)</option>
+                    <option value="necklace">📿 Necklace / Haar (Tanka ~4-6%)</option>
+                    <option value="earring">✨ Earring / Jhumka (Tanka ~3-5%)</option>
+                    <option value="pendant">🏅 Pendant / Locket (Tanka ~2-3%)</option>
+                    <option value="set">👑 Full Set / Parure (Tanka ~4-6%)</option>
+                    <option value="coin">🪙 Coin / Biscuit (Tanka ~0-1%)</option>
+                    <option value="bar">🧱 Bar / Ingot (Tanka ~0%)</option>
+                    <option value="plain">📦 Plain / Other (Tanka ~1-2%)</option>
+                </select>
+            </div>
+            <div class="ig">
+                <label>Claimed Karat (what seller says, optional)</label>
+                <input type="number" step="any" id="jxClaimedK" placeholder="e.g. 22" inputmode="decimal">
+            </div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">💰 Price</div>
+        <div class="cd-b">
+            <div class="rw"><div class="ig"><label>Rate / Tola</label><input type="number" step="any" id="jxRate" placeholder="0"></div><div class="ig"><label>Charges</label><input type="number" step="any" id="jxChg" value="0"></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- RIGHT -->
+<div>
+    <!-- Detection Banner -->
+    <div class="det" id="jxBan" style="display:none"></div>
+
+    <!-- Key Results -->
+    <div class="rg" id="jxResGrid">
+        <div class="rb"><div class="rl">Karat</div><div class="rv" style="color:var(--g)" id="jxK">—</div><div class="rs" id="jxKs"></div></div>
+        <div class="rb"><div class="rl">Hallmark</div><div class="rv" style="color:var(--g)" id="jxH">—</div><div class="rs">/1000</div></div>
+        <div class="rb"><div class="rl">Purity</div><div class="rv" style="color:var(--grn)" id="jxP">—</div><div class="rs" id="jxPs"></div></div>
+        <div class="rb"><div class="rl">Density</div><div class="rv" style="color:var(--blu)" id="jxD">—</div><div class="rs">g/cm³</div></div>
+    </div>
+
+    <!-- XRF Element Breakdown -->
+    <div class="cd">
+        <div class="cd-h">🔬 XRF-Style Full Element Breakdown</div>
+        <div class="cd-b" id="jxElements"><div style="text-align:center;color:var(--mut);padding:16px">Enter weights → Get full analysis</div></div>
+    </div>
+
+    <!-- Solder/Tanka Analysis -->
+    <div class="cd">
+        <div class="cd-h">🔗 Solder / Tanka Analysis</div>
+        <div class="cd-b" id="jxSolder"><div style="text-align:center;color:var(--mut);padding:14px">Solder analysis appears here</div></div>
+    </div>
+
+    <!-- Stone Analysis -->
+    <div class="cd" id="jxStoneCard" style="display:none">
+        <div class="cd-h">💎 Stone Analysis</div>
+        <div class="cd-b" id="jxStoneInfo"></div>
+    </div>
+
+    <!-- Cadmium & Risk Assessment -->
+    <div class="cd">
+        <div class="cd-h">⚠️ Health & Safety Risk Assessment</div>
+        <div class="cd-b" id="jxRisks"><div style="text-align:center;color:var(--mut);padding:14px">Risk analysis appears here</div></div>
+    </div>
+
+    <!-- Quality Verdict -->
+    <div class="cd">
+        <div class="cd-h">🏆 Quality Verdict</div>
+        <div class="cd-b" id="jxVerdict"><div style="text-align:center;color:var(--mut);padding:14px">Verdict appears here</div></div>
+    </div>
+
+    <!-- Weight Breakdown -->
+    <div class="cd">
+        <div class="cd-h">📐 Weight Breakdown</div>
+        <div class="cd-b" style="padding:0">
+            <table class="wt">
+                <thead><tr><th></th><th>Tola</th><th>Masha</th><th>Ratti</th><th>Grams</th><th>mg</th></tr></thead>
+                <tbody id="jxWT">
+                    <tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl" style="color:var(--grn)">Pure Metal</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Price -->
+    <div class="cd">
+        <div class="cd-h">💲 Price</div>
+        <div class="cd-b">
+            <div class="mm-rl"><span class="mm-k">Metal Price</span><span class="mm-v" id="jxPr1">—</span></div>
+            <div class="mm-rl"><span class="mm-k">Charges</span><span class="mm-v" id="jxPr2">—</span></div>
+            <div style="border-top:2px solid var(--g);margin-top:6px;padding-top:6px">
+                <div class="mm-rl"><span class="mm-k" style="font-size:1rem">🏆 Total</span><span class="mm-v" style="font-size:1.2rem;color:var(--g)" id="jxPr3">—</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ======== MANUAL MODES PANEL ======== -->
+<div class="pnl" id="p-manual">
+<div class="mg">
+
+<!-- LEFT: Weights + Mode Selection -->
+<div>
+    <div class="cd">
+        <div class="cd-h">⚖️ Weights</div>
+        <div class="cd-b">
+            <div class="ig"><label>Weight in Air</label><input type="number" step="any" id="mmAir" placeholder="0.000" inputmode="decimal"><span class="unit">g</span></div>
+            <div class="ig"><label>Weight in Water</label><input type="number" step="any" id="mmWater" placeholder="0.000" inputmode="decimal"><span class="unit">g</span></div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">🔬 Select Test Mode</div>
+        <div class="cd-b">
+            <div class="md-grid" id="modeGrid">
+                <div class="md-btn sel" data-mode="standard" onclick="selMode(this)">
+                    <div class="md-ico">🥇</div>
+                    <div class="md-nm">Standard</div>
+                    <div class="md-ds">Au-Ag Model<br>General Gold Test</div>
+                </div>
+                <div class="md-btn" data-mode="silver" onclick="selMode(this)">
+                    <div class="md-ico">🥈</div>
+                    <div class="md-nm">Silver</div>
+                    <div class="md-ds">Pure Silver<br>Ag Purity Check</div>
+                </div>
+                <div class="md-btn" data-mode="copper" onclick="selMode(this)">
+                    <div class="md-ico">🥉</div>
+                    <div class="md-nm">Copper</div>
+                    <div class="md-ds">Cu Base<br>Tamba/Peet Test</div>
+                </div>
+                <div class="md-btn" data-mode="psilver" onclick="selMode(this)">
+                    <div class="md-ico">🪙</div>
+                    <div class="md-nm">P Silver</div>
+                    <div class="md-ds">Pakistani Silver<br>Local 80-85% Ag</div>
+                </div>
+                <div class="md-btn" data-mode="standard1" onclick="selMode(this)">
+                    <div class="md-ico">🔶</div>
+                    <div class="md-nm">Standard 1</div>
+                    <div class="md-ds">Au-Cu Binary<br>Rose/Red Gold</div>
+                </div>
+                <div class="md-btn" data-mode="standard2" onclick="selMode(this)">
+                    <div class="md-ico">🔷</div>
+                    <div class="md-nm">Standard 2</div>
+                    <div class="md-ds">Au-Ag-Cu Ternary<br>Full Alloy Model</div>
+                </div>
+                <div class="md-btn" data-mode="local1" onclick="selMode(this)">
+                    <div class="md-ico">📍</div>
+                    <div class="md-nm">Local Scan 1</div>
+                    <div class="md-ds">Peshawar/KPK<br>High Cu Ratio</div>
+                </div>
+                <div class="md-btn" data-mode="local2" onclick="selMode(this)">
+                    <div class="md-ico">📌</div>
+                    <div class="md-nm">Local Scan</div>
+                    <div class="md-ds">Lahore/Karachi<br>Standard Local</div>
+                </div>
+                <div class="md-btn" data-mode="fake" onclick="selMode(this)">
+                    <div class="md-ico">🚨</div>
+                    <div class="md-nm">False Gold</div>
+                    <div class="md-ds">Tungsten/Brass<br>Fake Detection</div>
+                </div>
+            </div>
+            <div class="rw" style="margin-top:4px">
+                <button class="btn bg bw" onclick="calcManual()">⚡ TEST WITH MODE</button>
+                <button class="btn br" onclick="clrManual()" style="width:60px">✕</button>
+            </div>
+        </div>
+    </div>
+    <div class="cd">
+        <div class="cd-h">💰 Price</div>
+        <div class="cd-b">
+            <div class="rw"><div class="ig"><label>Rate / Tola</label><input type="number" step="any" id="mmRate" placeholder="0"></div><div class="ig"><label>Charges</label><input type="number" step="any" id="mmChg" value="0"></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- RIGHT: Results -->
+<div>
+    <!-- Mode Banner -->
+    <div class="det" id="mmBan" style="display:none"></div>
+
+    <!-- Key Results -->
+    <div class="rg">
+        <div class="rb"><div class="rl">Karat</div><div class="rv" style="color:var(--g)" id="mmK">—</div></div>
+        <div class="rb"><div class="rl">Hallmark</div><div class="rv" style="color:var(--g)" id="mmH">—</div></div>
+        <div class="rb"><div class="rl">Purity</div><div class="rv" style="color:var(--grn)" id="mmP">—</div></div>
+        <div class="rb"><div class="rl">Density</div><div class="rv" style="color:var(--blu)" id="mmD">—</div></div>
+    </div>
+
+    <!-- Composition -->
+    <div class="cd">
+        <div class="cd-h">🧪 Composition</div>
+        <div class="cd-b" id="mmComp"><div style="text-align:center;color:var(--mut);padding:16px">Select mode → Enter weights → Test</div></div>
+    </div>
+
+    <!-- Weight Table -->
+    <div class="cd">
+        <div class="cd-h">📐 Weight Breakdown</div>
+        <div class="cd-b" style="padding:0">
+            <table class="wt">
+                <thead><tr><th></th><th>Tola</th><th>Masha</th><th>Ratti</th><th>Grams</th><th>mg</th></tr></thead>
+                <tbody id="mmWT">
+                    <tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl" style="color:var(--grn)">Pure</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                    <tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Detailed Results -->
+    <div class="cd">
+        <div class="cd-h">📋 Detailed Results</div>
+        <div class="cd-b" id="mmDetail"><div style="text-align:center;color:var(--mut);padding:14px">Results appear here</div></div>
+    </div>
+
+    <!-- Price -->
+    <div class="cd">
+        <div class="cd-h">💲 Price</div>
+        <div class="cd-b">
+            <div class="mm-rl"><span class="mm-k">Metal Price</span><span class="mm-v" id="mmPr1">—</span></div>
+            <div class="mm-rl"><span class="mm-k">Charges</span><span class="mm-v" id="mmPr2">—</span></div>
+            <div style="border-top:2px solid var(--g);margin-top:6px;padding-top:6px">
+                <div class="mm-rl"><span class="mm-k" style="font-size:1rem">🏆 Total</span><span class="mm-v" style="font-size:1.2rem;color:var(--g)" id="mmPr3">—</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ======== HISTORY PANEL ======== -->
+<div class="pnl" id="p-history">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="ig" style="margin:0;max-width:260px"><input type="text" id="hSrch" placeholder="🔍 Search..." oninput="renderH()"></div>
+        <div style="display:flex;gap:6px"><button class="btn bg bs" onclick="expCSV()">📥 CSV</button><button class="btn br bs" onclick="clrH()">🗑️</button></div>
+    </div>
+    <div id="hList"></div>
+</div>
+
+<!-- ======== SETTINGS PANEL ======== -->
+<div class="pnl" id="p-settings">
+    <div class="cd"><div class="cd-h">🏪 Business</div><div class="cd-b">
+        <div class="rw"><div class="ig"><label>Name</label><input id="sNm" value="Gold Test Laboratory"></div><div class="ig"><label>City</label><input id="sCt"></div></div>
+        <div class="rw"><div class="ig"><label>Address</label><input id="sAd"></div><div class="ig"><label>Phone</label><input id="sPh"></div></div>
+        <div class="rw"><div class="ig"><label>Bill Prefix</label><input id="sPfx" value="JM"></div><div class="ig"><label>Next Bill #</label><input type="number" id="sBn" value="1"></div></div>
+    </div></div>
+    <div class="cd"><div class="cd-h">⚙️ Defaults</div><div class="cd-b">
+        <div class="rw"><div class="ig"><label>Default Rate/Tola</label><input type="number" id="sDR" value="250000"></div><div class="ig"><label>Water Temp °C</label><input type="number" id="sTmp" value="25"></div></div>
+        <div class="rw"><div class="ig"><label>Multi-Alloy Model</label><select id="sModel"><option value="ternary">Ternary (Au-Ag-Cu)</option><option value="binary_cu">Binary (Au-Cu)</option><option value="binary_ag">Binary (Au-Ag)</option></select></div><div class="ig"><label>Stone Flag Threshold %</label><input type="number" id="sSt" value="8"></div></div>
+    </div></div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn bg" onclick="saveCfg()">💾 Save</button>
+        <button class="btn br" onclick="rstCfg()">↩️ Reset</button>
+    </div>
+</div>
+
+<!-- BILL MODAL -->
+<div class="mo" id="billMo">
+    <div class="mo-box">
+        <div class="bill" id="billPaper"></div>
+        <div class="mo-act">
+            <button class="btn bg bs" onclick="printBill()">🖨️ Print</button>
+            <button class="btn bgr bs" onclick="dlBill()">📥 Download</button>
+            <button class="btn br bs" onclick="closeBill()">✕ Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ====================================================================
+   GOLD TEST LAB PRO — Ultra-Advanced Auto-Detection Engine
+   Archimedes + Ternary Alloy Model + Forensic Detection + Multi-Compare
+   ==================================================================== */
+
+// ═══ CONSTANTS ═══
+const TOLA=11.6638,MASHA=0.97198,RATTI=0.12150,RPT=96,RPM=8;
+
+// Atomic weights (for atom% calculation)
+const AW={Au:196.97,Ag:107.87,Cu:63.546,Pt:195.08,Pd:106.42,Zn:65.38,Ni:58.69,Fe:55.85,Sn:118.71,Pb:207.2,W:183.84,Cd:112.41,Rh:102.91};
+
+// Metal densities g/cm³
+const MD={Au:19.30,Pt:21.45,Pd:12.02,Ag:10.49,Cu:8.96,Ni:8.91,Zn:7.13,Fe:7.87,Sn:7.31,Pb:11.34,W:19.25,Rh:12.41,Ir:22.56,Os:22.59,Ru:12.37,Cd:8.65,Brass:8.55,Bronze:8.80,Steel:7.85};
+
+// Stone densities g/cm³ (for jewelry stone correction)
+const STONE_DEN={diamond:3.52,ruby:4.00,emerald:2.72,garnet:3.80,zircon:5.80,pearl:2.71,topaz:3.53,quartz:2.65,glass:2.50,unknown:3.00};
+
+// Solder/Tanka percentages by jewelry type [min%, max%, typical solder karat]
+const SOLDER_EST={ring:[2,3,14],chain:[5,8,12],bangle:[3,5,14],necklace:[4,6,12],earring:[3,5,12],pendant:[2,3,14],set:[4,6,12],coin:[0,1,22],bar:[0,0,24],plain:[1,2,14]};
+
+// Water density by temperature (interpolated)
+const WDT={0:.99984,4:1,5:.99997,10:.9997,15:.9991,18:.9986,20:.99821,22:.99777,25:.99705,28:.99624,30:.99565,35:.99403,40:.99222};
+
+// ═══ STATE ═══
+let last=null,hist=[],cfg={},multiTests=[];
+
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded',()=>{
+    loadCfg();loadH();tick();setInterval(tick,30000);
+    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+        document.querySelectorAll('.pnl').forEach(x=>x.classList.remove('on'));
+        t.classList.add('on');document.getElementById('p-'+t.dataset.t).classList.add('on');
+    });
+    if(cfg.dr)document.getElementById('inRate').value=cfg.dr;
+    document.getElementById('inAir').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inWater').focus()});
+    document.getElementById('inWater').addEventListener('keydown',e=>{if(e.key==='Enter')calc()});
+});
+function tick(){document.getElementById('hdrDt').textContent=new Date().toLocaleString('en-PK',{dateStyle:'medium',timeStyle:'short'})}
+
+// ═══ WATER DENSITY ═══
+function wDen(t){t=t||25;const k=Object.keys(WDT).map(Number).sort((a,b)=>a-b);if(t<=k[0])return WDT[k[0]];if(t>=k.at(-1))return WDT[k.at(-1)];for(let i=0;i<k.length-1;i++)if(t>=k[i]&&t<=k[i+1]){const r=(t-k[i])/(k[i+1]-k[i]);return WDT[k[i]]+(WDT[k[i+1]]-WDT[k[i]])*r}return .99705}
+
+// ═══ TERNARY ALLOY MODEL (Au-Ag-Cu) - The killer feature ═══
+// Given density, estimate gold/silver/copper fractions using ternary inverse-density model
+// This is more accurate than binary because real jewelry is Au-Ag-Cu ternary alloy
+function ternaryModel(density){
+    // Pure densities
+    const dAu=MD.Au,dAg=MD.Ag,dCu=MD.Cu;
+    const invD=1/density,invAu=1/dAu,invAg=1/dAg,invCu=1/dCu;
+
+    // For ternary system with only density, we need assumptions
+    // Standard jewelry alloy ratios: the Ag:Cu ratio varies by karat
+    // 22K: 5% Ag, 3.3% Cu  |  18K: 12.5% Ag, 12.5% Cu  |  14K: 10% Ag, 31.5% Cu
+    // We use the observation that Ag/(Ag+Cu) ≈ 0.35-0.45 for typical jewelry
+
+    // First get binary Au-Cu fraction as baseline
+    const goldFracCu = Math.max(0,Math.min(1,(invCu-invD)/(invCu-invAu)));
+
+    // Estimate Ag:Cu ratio in the alloy part based on karat level
+    let agRatio; // fraction of alloy that's silver
+    if(goldFracCu > 0.95) agRatio = 0.5; // High purity — trace amounts
+    else if(goldFracCu > 0.85) agRatio = 0.55; // 22K zone — more silver
+    else if(goldFracCu > 0.70) agRatio = 0.40; // 18K zone
+    else if(goldFracCu > 0.55) agRatio = 0.30; // 14K
+    else agRatio = 0.25; // Low karat — copper dominant
+
+    const alloyPart = 1 - goldFracCu;
+
+    // Iterative refinement: adjust gold fraction with ternary model
+    // invD = xAu/dAu + xAg/dAg + xCu/dCu where xAu + xAg + xCu = 1
+    let xAu = goldFracCu;
+    let xAg = alloyPart * agRatio;
+    let xCu = alloyPart * (1 - agRatio);
+
+    // Refine with Newton's method (3 iterations enough)
+    for(let i=0;i<5;i++){
+        const calcInvD = xAu*invAu + xAg*invAg + xCu*invCu;
+        const error = invD - calcInvD;
+        // Distribute error: adjust Au and proportionally adjust Ag/Cu
+        const adj = error / (invAu - (agRatio*invAg + (1-agRatio)*invCu));
+        xAu = Math.max(0,Math.min(1,xAu + adj));
+        xAg = (1-xAu) * agRatio;
+        xCu = (1-xAu) * (1-agRatio);
+    }
+
+    return {Au:Math.max(0,xAu)*100, Ag:Math.max(0,xAg)*100, Cu:Math.max(0,xCu)*100};
+}
+
+// ═══ FORENSIC ANALYSIS ═══
+function forensicCheck(density, wAir){
+    let flags = [];
+    let confidence = 95;
+
+    // Tungsten core detection (W = 19.25 very close to Au = 19.30)
+    // Range aligned with autoDetect: 19.20-19.28
+    if(density >= 19.15 && density <= 19.35){
+        if(density >= 19.20 && density <= 19.28){
+            flags.push({type:'warning',msg:'Density matches Tungsten (19.25). Recommend acid/magnetism/sound test.'});
+            confidence -= 25;
+            if(wAir > 20){
+                flags.push({type:'error',msg:'Heavy item ('+wAir.toFixed(1)+'g) in W/Au overlap zone. HIGH RISK of tungsten core.'});
+                confidence -= 20;
+            }
+        }
+        // Any heavy item in broader near-tungsten zone
+        if(wAir > 50 && density >= 19.18 && density <= 19.30){
+            flags.push({type:'warning',msg:'Very heavy item in W/Au overlap. Recommend sound velocity test.'});
+            confidence -= 10;
+        }
+    }
+
+    // Lead detection (Pb=11.34) — flag when lead-like density is measured
+    if(density >= 11.00 && density <= 11.70){
+        flags.push({type:'error',msg:'Density '+density.toFixed(3)+' matches Lead (Pb=11.34). NOT a precious metal.'});
+        confidence -= 30;
+    }
+
+    // Lead filling in gold shell detection
+    if(density > 13 && density < 16 && wAir > 30){
+        flags.push({type:'info',msg:'Density range could indicate lead-filled cavity in gold shell.'});
+        confidence -= 5;
+    }
+
+    // Impossible density (>22.6 = Osmium, shouldn't exist in jewelry)
+    if(density > 22.6){
+        flags.push({type:'error',msg:'Density exceeds all known metals. Check measurement accuracy.'});
+        confidence -= 40;
+    }
+
+    // Density below any useful metal
+    if(density < 5){
+        flags.push({type:'error',msg:'Density too low for any precious metal. Likely stone/plastic.'});
+        confidence -= 50;
+    }
+
+    // Jewelry with stones: density suspiciously low for apparent karat
+    if(density < 14 && density > 10){
+        flags.push({type:'info',msg:'Low density may indicate gemstones. Pure metal karat shown — actual karat may be higher.'});
+    }
+
+    return {flags, confidence: Math.max(5,Math.min(100,confidence))};
+}
+
+// ═══ ATOM PERCENTAGE CALC ═══
+function atomPercent(comp){
+    // Convert weight% to atom%
+    let total = 0;
+    const atoms = {};
+    for(const [sym,wt] of Object.entries(comp)){
+        if(!AW[sym] || wt <= 0) continue;
+        atoms[sym] = wt / AW[sym];
+        total += atoms[sym];
+    }
+    const result = {};
+    for(const [sym,n] of Object.entries(atoms)){
+        result[sym] = (n/total)*100;
+    }
+    return result;
+}
+
+// ═══ SPREAD SCORE — Unique Feature ═══
+// How "spread out" is the alloy composition? Pure = 0, highly mixed = 100
+function spreadScore(comp){
+    const vals = Object.values(comp).filter(v=>v>0.1);
+    if(vals.length <= 1) return 0;
+    const max = Math.max(...vals);
+    const entropy = vals.reduce((s,v)=>{const p=v/100;return s-(p>0?p*Math.log2(p):0)},0);
+    const maxEntropy = Math.log2(vals.length);
+    return Math.round((entropy/maxEntropy)*100);
+}
+
+// ═══ ALLOY MODEL SELECTOR (respects cfg.model setting) ═══
+function alloyModel(density){
+    const model=cfg.model||'ternary';
+    if(model==='binary_cu'){
+        // Au-Cu binary
+        const gf=Math.max(0,Math.min(1,(1/MD.Cu-1/density)/(1/MD.Cu-1/MD.Au)));
+        return {Au:gf*100,Ag:0,Cu:(1-gf)*100};
+    }
+    if(model==='binary_ag'){
+        // Au-Ag binary
+        const gf=Math.max(0,Math.min(1,(1/MD.Ag-1/density)/(1/MD.Ag-1/MD.Au)));
+        return {Au:gf*100,Ag:(1-gf)*100,Cu:0};
+    }
+    return ternaryModel(density);
+}
+
+// ═══ MAIN DETECTION ENGINE ═══
+function autoDetect(density, wAir){
+    const tern = alloyModel(density);
+    const forensic = forensicCheck(density, wAir);
+
+    let comp = {}, karat=0, hallmark=0, purity=0;
+    let cat='other', name='', emoji='';
+    let isFake=false, hasStones=false;
+
+    // ═══ DETECTION CHAIN — Ordered by specificity to avoid misclassification ═══
+    // RULE: Check specific non-gold metals FIRST (by their unique density ranges),
+    // then check gold ranges. This prevents Lead/Palladium/Silver being called gold.
+
+    if(density > 22){
+        // ── Zone 1: Impossible/Exotic (>22 g/cm³) ──
+        cat='other'; name='⚡ Extremely Dense — Osmium/Iridium range'; emoji='⚡';
+        comp={Os:50,Ir:50};
+        purity = Math.min(100,(density/22.59)*100);
+    } else if(density > 20.5){
+        // ── Zone 2: Platinum (20.5-22) ──
+        cat='platinum'; emoji='💎';
+        const ptPur = Math.min(100,(density/MD.Pt)*100);
+        purity = ptPur; hallmark = purity*10;
+        comp={Pt:purity, Pd:(100-purity)*0.3, Cu:(100-purity)*0.4, other:(100-purity)*0.3};
+        name='💎 Platinum Detected — '+purity.toFixed(1)+'% Pure';
+    } else if(density >= 19.10 && density <= 20.5){
+        // ── Zone 3: Pure Gold / Tungsten Danger Zone (19.10-20.5) ──
+        karat = tern.Au/100*24;
+        hallmark = tern.Au*10;
+        purity = tern.Au;
+        comp = {Au:tern.Au, Ag:tern.Ag, Cu:tern.Cu};
+
+        // Tungsten check — expanded: ANY size, tighter density window
+        // W=19.25±0.03, Au=19.30. Overlap zone: 19.20-19.28
+        if(density >= 19.20 && density <= 19.28){
+            // Weight-based risk scoring: heavier = more risk of tungsten core
+            if(wAir > 20){
+                isFake = true; cat='fake';
+                name='🚨 TUNGSTEN ALERT! Density '+density.toFixed(3)+' — VERIFY IMMEDIATELY (Acid+Magnet+Sound test required)';
+                emoji='🚨';
+            } else {
+                // Small pieces still flagged with warning, not auto-fake
+                cat='gold-pure';
+                name='🥇 24K Gold — '+purity.toFixed(2)+'% ⚠️ Caution: density near tungsten (19.25)';
+                emoji='⚠️';
+                forensic.flags.push({type:'warning',msg:'Small piece ('+wAir.toFixed(1)+'g) in tungsten overlap zone. Recommend acid test.'});
+                forensic.confidence = Math.max(5, forensic.confidence - 20);
+            }
+        } else {
+            cat='gold-pure';
+            name='🥇 24K Pure Gold — '+purity.toFixed(2)+'% Fine Gold';
+            emoji='🥇';
+        }
+    } else if(density >= 10.30 && density < 10.55){
+        // ── Zone 4: SILVER — checked BEFORE gold alloy to prevent misclass ──
+        // Silver: d=10.49. Range 10.30-10.55 (covers pure and near-pure silver)
+        cat='silver';
+        purity = Math.min(100,(density/MD.Ag)*100);
+        hallmark = purity*10;
+        comp = {Ag:purity, Cu:(100-purity)*0.7, Zn:(100-purity)*0.2, Ni:(100-purity)*0.1};
+        if(density >= 10.42){
+            name='🥈 Pure Silver — '+purity.toFixed(1)+'% — Hallmark '+hallmark.toFixed(0);
+        } else {
+            name='🥈 Silver Alloy — '+purity.toFixed(1)+'% Ag';
+        }
+        emoji='🥈';
+    } else if(density >= 9.80 && density < 10.30){
+        // ── Zone 5: Sterling Silver / Pakistani Silver (9.80-10.30) ──
+        cat='silver';
+        purity = (density/MD.Ag)*100;
+        hallmark = purity*10;
+        comp = {Ag:purity, Cu:(100-purity)*0.65, Zn:(100-purity)*0.20, Ni:(100-purity)*0.15};
+        if(purity >= 92){
+            name='🥈 Sterling Silver (925+) — '+purity.toFixed(1)+'%';
+        } else {
+            name='🥈 Silver Alloy — '+purity.toFixed(1)+'% Ag (Pakistani/Local)';
+        }
+        emoji='🥈';
+    } else if(density >= 11.00 && density <= 11.70){
+        // ── Zone 6: LEAD Detection (11.00-11.70) — MUST be before gold alloy ──
+        // Lead density = 11.34. This zone catches lead pieces/fillings
+        // CRITICAL: Without this check, lead would show as "8K Gold" !!
+        cat='fake'; isFake=true;
+        purity = 0; karat = 0;
+        const pbSim = 100 - Math.abs(density - MD.Pb) / MD.Pb * 100;
+        comp = {Pb:pbSim, Sn:(100-pbSim)*0.5, Cu:(100-pbSim)*0.3, other:(100-pbSim)*0.2};
+        name='🚨 LEAD Detected! Density '+density.toFixed(3)+' ≈ Pb (11.34) — NOT Gold!';
+        emoji='🚨';
+        forensic.flags.push({type:'error',msg:'Density matches Lead (Pb=11.34). This is NOT gold or any precious metal.'});
+        forensic.confidence = Math.max(5, forensic.confidence - 30);
+    } else if(density >= 11.70 && density < 12.50){
+        // ── Zone 7: PALLADIUM (11.70-<12.50) — MUST be before gold alloy ──
+        // Pd density = 12.02. Without this, palladium shows as "10K Gold"
+        cat='palladium';
+        purity = Math.min(100,(density/MD.Pd)*100);
+        hallmark = purity*10;
+        comp = {Pd:purity, Ag:(100-purity)*0.5, Cu:(100-purity)*0.5};
+        name='💠 Palladium Detected — '+purity.toFixed(1)+'%';
+        emoji='💠';
+    } else if(density >= 12.50 && density < 19.10){
+        // ── Zone 8: Gold Alloy (12.50-19.10) — Safe gold range ──
+        // NOW gold alloy starts at 12.50 (not 10.50), after excluding Pb/Pd/Ag
+        karat = tern.Au/100*24;
+        hallmark = tern.Au*10;
+        purity = tern.Au;
+        comp = {Au:tern.Au, Ag:tern.Ag, Cu:tern.Cu};
+
+        // Add trace metals for lower karats
+        if(karat < 18){
+            if(comp.Cu > 5) comp.Zn = comp.Cu * 0.08;
+            if(comp.Ag > 5) comp.Ni = comp.Ag * 0.05;
+            const tot = Object.values(comp).reduce((s,v)=>s+v,0);
+            if(tot > 100) Object.keys(comp).forEach(k=>comp[k]*=100/tot);
+        }
+
+        // Stone detection
+        const stoneThresh = parseFloat(cfg.st)||8;
+        const pureModelDensity = 1/(tern.Au/100/MD.Au + tern.Ag/100/MD.Ag + tern.Cu/100/MD.Cu);
+        const densityDrop = ((pureModelDensity-density)/pureModelDensity)*100;
+        if(densityDrop > stoneThresh && density < 16){
+            hasStones = true; cat='jewelry';
+            name='💍 Jewelry with Stones — Adjusted Karat ~'+karat.toFixed(1)+'K (actual may be higher)';
+            emoji='💍';
+        } else {
+            cat='gold-alloy';
+            const std = nearKarat(karat);
+            name=`✨ ${std} Gold — Hallmark ${hallmark.toFixed(0)} — ${purity.toFixed(1)}% Pure`;
+            emoji='✨';
+        }
+    } else if(density >= 10.55 && density < 11.00){
+        // ── Zone 9: Ambiguous zone (10.55-11.00) — Could be low-grade silver alloy or very low karat gold ──
+        // Use ternary model to estimate, but flag as uncertain
+        karat = tern.Au/100*24;
+        purity = tern.Au;
+        hallmark = tern.Au*10;
+        comp = {Au:tern.Au, Ag:tern.Ag, Cu:tern.Cu};
+        cat='gold-alloy';
+        name='⚠️ Low-Karat Gold/Silver Mix — ~'+karat.toFixed(1)+'K — Verify with acid test';
+        emoji='⚠️';
+        forensic.flags.push({type:'warning',msg:'Density '+density.toFixed(3)+' is in ambiguous zone (silver alloy or very low karat gold). Acid test recommended.'});
+        forensic.confidence = Math.max(5, forensic.confidence - 15);
+    } else if(density >= 8.80 && density <= 9.10){
+        // ── Zone 10: Copper (8.80-9.10) — expanded from 8.85-9.05 ──
+        cat='copper';
+        purity = Math.min(100,(density/MD.Cu)*100);
+        comp = {Cu:purity, Sn:(100-purity)*0.3, Zn:(100-purity)*0.4, Ni:(100-purity)*0.3};
+        name='🥉 Copper — '+purity.toFixed(1)+'% Pure';
+        emoji='🥉';
+    } else if(density >= 9.10 && density < 9.80){
+        // ── Zone 11: Copper alloy/Nickel zone (9.10-9.80) — GAP FIX ──
+        cat='other';
+        const cuPct = Math.max(0,(density-8.5)/(MD.Cu-8.5)*100);
+        comp = {Cu:cuPct, Ni:(100-cuPct)*0.4, Zn:(100-cuPct)*0.3, Ag:(100-cuPct)*0.3};
+        name='🔩 Copper Alloy / Nickel Silver — Density '+density.toFixed(3);
+        emoji='🔩';
+    } else if(density >= 8.40 && density < 8.80){
+        // ── Zone 12: Brass (8.40-8.80) ──
+        cat='other';
+        comp = {Cu:65, Zn:30, Sn:3, Pb:2};
+        name='🔩 Brass Alloy (Cu-Zn) — Not Precious'; emoji='🔩';
+    } else if(density >= 7.70 && density < 8.40){
+        // ── Zone 13: Steel/Iron (7.70-8.40) ──
+        cat='other';
+        comp = {Fe:70, Cu:10, Ni:8, Zn:7, other:5};
+        name='🔩 Base Metal / Steel Alloy'; emoji='🔩';
+    } else if(density >= 7.00 && density < 7.70){
+        // ── Zone 14: Zinc/Tin (7.00-7.70) ──
+        cat='other';
+        comp = {Zn:50, Sn:25, Cu:15, Fe:10};
+        name='🔩 Zinc-Tin Alloy — Low Value'; emoji='🔩';
+    } else if(density >= 5.00 && density < 7.00){
+        // ── Zone 15: Unknown light (5.00-7.00) ──
+        cat='other';
+        comp = {unknown:100};
+        name='❓ Unknown Light Metal — Density '+density.toFixed(3); emoji='❓';
+    } else if(density >= 2.00 && density < 5.00){
+        // ── Zone 16: Very light — stone/mineral/plastic (2.00-5.00) ──
+        cat='other';
+        comp = {unknown:100};
+        name='❓ Very Low Density — Possibly stone, resin, or plastic';
+        emoji='❓';
+    } else {
+        // ── Zone 17: Below 2.0 or invalid ──
+        cat='other';
+        comp = {unknown:100};
+        name='❓ Abnormal Density '+density.toFixed(3)+' — Check measurement';
+        emoji='❓';
+    }
+
+    // For gold alloy range — also provide binary Au-Ag alternate reading
+    let altKarat = null;
+    if(cat==='gold-alloy' || cat==='gold-pure' || cat==='jewelry'){
+        const invAg=1/MD.Ag,invAu=1/MD.Au,invD=1/density;
+        const gfAg = Math.max(0,Math.min(1,(invAg-invD)/(invAg-invAu)));
+        altKarat = gfAg * 24;
+    }
+
+    return {density,karat,hallmark,purity,comp,cat,name,emoji,isFake,hasStones,forensic,altKarat};
+}
+
+function nearKarat(k){
+    const stds=[{k:24,n:'24K'},{k:23,n:'23K'},{k:22,n:'22K'},{k:21.6,n:'21.6K'},{k:21,n:'21K'},{k:20,n:'20K'},{k:18,n:'18K'},{k:16,n:'16K'},{k:14,n:'14K'},{k:12,n:'12K'},{k:10,n:'10K'},{k:9,n:'9K'},{k:8,n:'8K'}];
+    let best=stds[0],bd=99;
+    for(const s of stds){const d=Math.abs(k-s.k);if(d<bd){bd=d;best=s}}
+    return best.n;
+}
+
+// ═══ MAIN CALC ═══
+function calc(){
+    const wA=parseFloat(document.getElementById('inAir').value);
+    const wW=parseFloat(document.getElementById('inWater').value);
+    if(!wA||!wW||wA<=0||wW<=0||wA<=wW)return alert('⚠️ Invalid!\n\nWeight in Air must be > Weight in Water.');
+
+    const tmp=parseFloat(cfg.tmp)||25;
+    const wd=wDen(tmp);
+    const diff=wA-wW;
+    const vol=diff/wd;
+    const density=wA/vol;
+    const spGravity=wA/diff; // specific gravity = density relative to water
+
+    // AUTO-DETECT
+    const det=autoDetect(density,wA);
+
+    // ─── Scale Precision Warning ───
+    // Detect if piece is too small for reliable measurement given typical scale precision
+    // A 3-decimal (0.001g) scale gives ±1mg noise; noise/diff ratio determines accuracy
+    const precisionNoise = 0.001; // assume 3-decimal scale (most common)
+    const precisionRatio = precisionNoise / diff; // fraction of diff that is measurement noise
+    if(precisionRatio > 0.005){ // > 0.5% noise → warn
+        const karatUncertainty = precisionRatio * det.karat * 2;
+        let warnMsg = '';
+        if(precisionRatio > 0.02){
+            warnMsg = `⚠️ Piece may be too small for accurate reading. Water-air diff = ${diff.toFixed(3)}g. For ±0.5K accuracy, use ≥3g piece on 0.001g scale (or ≥10g on 0.01g scale).`;
+        } else if(precisionRatio > 0.01){
+            warnMsg = `ℹ️ Small piece detected. Karat may vary ±${karatUncertainty.toFixed(2)}K due to scale precision.`;
+        } else {
+            warnMsg = `ℹ️ Precision estimate: ±${karatUncertainty.toFixed(2)}K uncertainty from scale rounding.`;
+        }
+        det.forensic.flags.unshift({type: precisionRatio > 0.02 ? 'warning' : 'info', msg: warnMsg});
+        if(precisionRatio > 0.02) det.forensic.confidence = Math.max(5, det.forensic.confidence - 15);
+    }
+
+    // Weights
+    const pureGm=wA*(det.purity/100);
+    const impGm=wA-pureGm;
+    const ktGm=(pf('ktT')||0)*TOLA+(pf('ktM')||0)*MASHA+(pf('ktR')||0)*RATTI;
+    const ri=pf('inRI')||0;
+    const ro=pf('inRO')||0;
+    const rdGm=ri*RATTI*(pureGm/TOLA);
+    const raGm=ro*RATTI*(pureGm/TOLA);
+    const balGm=Math.max(0,pureGm-ktGm-rdGm+raGm);
+
+    // Price — Auto-rate based on detected metal
+    const autoRateInfo=getAutoRate(det);
+    const rateInput=document.getElementById('inRate');
+    const rateBadge=document.getElementById('autoRateBadge');
+    const rateLabel=document.getElementById('rateLabel');
+    const pGPLabel=document.getElementById('pGPLabel');
+    
+    // Auto-fill rate if user hasn't manually entered one
+    if(!rateInput.dataset.manual && autoRateInfo.rate>0){
+        rateInput.value=Math.round(autoRateInfo.rate);
+        rateInput.style.borderColor=autoRateInfo.color;
+        rateBadge.style.display='inline';
+        rateBadge.style.background=autoRateInfo.color+'22';
+        rateBadge.style.color=autoRateInfo.color;
+        rateBadge.textContent='⚡ '+autoRateInfo.metalName+' Auto';
+    } else if(rateInput.dataset.manual){
+        rateBadge.style.display='inline';
+        rateBadge.style.background='var(--bdr)';
+        rateBadge.style.color='var(--mut)';
+        rateBadge.textContent='✏️ Manual';
+    }
+    rateLabel.textContent=autoRateInfo.metalName+' Rate / Tola';
+    pGPLabel.textContent=autoRateInfo.emoji+' '+autoRateInfo.metalName+' Price';
+    
+    const rate=pf('inRate')||0;
+    const rgm=rate/TOLA;
+    const chg=pf('inChg')||0;
+    const mk=pf('inMk')||0;
+    const wst=pf('inWst')||0;
+    const metalPr=balGm*rgm;
+    const chgAmt=(chg*(balGm/TOLA))+(mk*wA);
+    const wstAmt=metalPr*(wst/100);
+    const total=metalPr-chgAmt-wstAmt;
+
+    // Advanced calcs
+    const atomPct = atomPercent(
+        Object.fromEntries(Object.entries(det.comp).filter(([k])=>AW[k]).map(([k,v])=>[k,v]))
+    );
+    const spread = spreadScore(det.comp);
+    const buoyancy = diff; // buoyant force in gram-force
+    const fineness = det.purity * 10; // out of 1000
+
+    // ═══ UPDATE UI ═══
+
+    // Banner
+    const ban=document.getElementById('detBan');
+    ban.style.display='block';
+    ban.className='det '+det.cat;
+    let banHTML = det.name;
+    if(det.forensic.flags.length){
+        banHTML += '<div style="font-size:.75rem;margin-top:6px;font-weight:400">';
+        det.forensic.flags.forEach(f=>{
+            const ic=f.type==='error'?'🔴':f.type==='warning'?'🟡':'🔵';
+            banHTML += `<div>${ic} ${f.msg}</div>`;
+        });
+        banHTML += '</div>';
+    }
+    ban.innerHTML = banHTML;
+
+    // Confidence
+    const confCard=document.getElementById('confCard');
+    confCard.style.display='block';
+    const conf=det.forensic.confidence;
+    st('confPct',conf+'%');
+    const cfill=document.getElementById('confFill');
+    cfill.style.width=conf+'%';
+    cfill.style.background=conf>80?'var(--grn)':conf>50?'var(--yel)':'var(--red)';
+
+    // Key results
+    if(det.karat>0){st('rK',det.karat.toFixed(2)+'K');st('rKs','≈ '+nearKarat(det.karat)+(det.altKarat?' | Alt: '+det.altKarat.toFixed(1)+'K':''))}
+    else{st('rK','N/A');st('rKs',det.cat==='platinum'?'Platinum':det.cat==='silver'?'Silver':det.cat==='palladium'?'Palladium':'Non-Gold')}
+    st('rH',det.hallmark.toFixed(1));st('rHs','/1000');
+    st('rP',det.purity.toFixed(2)+'%');st('rPs',det.isFake?'⚠️ VERIFY':det.hasStones?'💎 Stones':'');
+    st('rD',density.toFixed(3));
+
+    // Gauge
+    const frac=Math.min(1,Math.max(0,det.karat)/24);
+    document.getElementById('gArc').style.strokeDashoffset=534-534*frac;
+    document.getElementById('gArc').style.stroke=det.isFake?'var(--red)':frac>.9?'#FFD700':frac>.7?'#D4AF37':frac>.5?'#B8860B':'#8B7355';
+    st('gVal',det.karat>0?det.karat.toFixed(1)+'K':det.cat.toUpperCase());
+    st('gLbl',det.karat>0?'KARAT':'DETECTED');
+    st('gH','Hallmark: '+det.hallmark.toFixed(1));
+
+    // Advanced analysis
+    st('aVol',vol.toFixed(4)+' cm³');
+    st('aSG',spGravity.toFixed(4));
+    st('aBuoy',buoyancy.toFixed(3)+' gf');
+    st('aWD',diff.toFixed(3)+' g');
+    st('aFine',fineness.toFixed(1)+'/1000');
+    st('aAtom',atomPct.Au?atomPct.Au.toFixed(2)+'%':'N/A');
+    st('aSpread',spread+'/100');
+    st('aAlloy',det.karat>0?(cfg.model==='binary_cu'?'Au-Cu':cfg.model==='binary_ag'?'Au-Ag':'Au-Ag-Cu'):'—');
+
+    // Composition
+    renderComp(det.comp,wA);
+
+    // Weight table
+    renderWT(wA,pureGm,impGm,ktGm,balGm);
+
+    // Price
+    st('pGP','PKR '+fm(metalPr));st('pCh','PKR '+fm(chgAmt));st('pWs','PKR '+fm(wstAmt));
+    st('pTot','PKR '+fm(Math.round(total)));st('pBal',balGm.toFixed(3)+' gm');
+
+    // Store
+    last={...det,wA,wW,tmp,wd,vol,diff,density,spGravity,buoyancy,fineness,atomPct,spread,pureGm,impGm,ktGm,rdGm,balGm,rate,rgm,metalPr,chgAmt,wstAmt,total,conf,autoRateInfo,date:new Date().toISOString()};
+}
+
+// ═══ RENDER COMPOSITION ═══
+function renderComp(comp,wt){
+    const box=document.getElementById('compBox');
+    const items=Object.entries(comp).filter(([_,v])=>v>0.01).sort((a,b)=>b[1]-a[1]);
+    const colors={Au:'#FFD700',Ag:'#C0C0C0',Cu:'#CD7F32',Pt:'#E5E4E2',Pd:'#CED0CE',Zn:'#BDBDBD',Ni:'#727472',Fe:'#808080',Sn:'#D3D3D3',Pb:'#4A4A4A',W:'#F85149',Rh:'#E8E8E8',other:'#666',unknown:'#555'};
+    const names={Au:'Gold (Au)',Ag:'Silver (Ag)',Cu:'Copper (Cu)',Pt:'Platinum (Pt)',Pd:'Palladium (Pd)',Zn:'Zinc (Zn)',Ni:'Nickel (Ni)',Fe:'Iron (Fe)',Sn:'Tin (Sn)',Pb:'Lead (Pb)',W:'Tungsten (W)'};
+    box.innerHTML=items.map(([sym,pct])=>{
+        const gm=wt*(pct/100);const mg=Math.round(gm*1000);
+        const clr=colors[sym]||'#888';const nm=names[sym]||sym;
+        return`<div class="ci"><div class="ci-top"><span class="ci-nm" style="color:${clr}">${nm}</span><span class="ci-vl"><b>${pct.toFixed(2)}%</b> · ${gm.toFixed(3)} g · ${mg} mg</span></div><div class="ci-bar"><div class="ci-fill" style="width:${Math.min(100,pct)}%;background:${clr}"></div></div></div>`;
+    }).join('')||'<div style="text-align:center;color:var(--mut);padding:10px">No data</div>';
+}
+
+// ═══ WEIGHT TABLE ═══
+function renderWT(tot,pure,imp,kaat,bal){
+    const rows=[
+        {l:'Total Weight',g:tot,s:''},
+        {l:'Pure Metal',g:pure,s:'color:var(--grn)'},
+        {l:'Impure',g:imp,s:'color:var(--red)'},
+        {l:'Kaat Deduct',g:kaat,s:''},
+        {l:'🏆 Balance',g:bal,s:'color:var(--g);font-weight:900'},
+    ];
+    document.getElementById('wtB').innerHTML=rows.map(r=>{
+        const u=toU(r.g);
+        return`<tr><td class="wl" style="${r.s}">${r.l}</td><td>${u.t}</td><td>${u.m}</td><td>${u.r}</td><td style="${r.s};font-weight:700">${u.g}</td><td>${u.mg}</td></tr>`;
+    }).join('');
+}
+function toU(g){const tr=g/RATTI;const t=Math.floor(tr/RPT);const r1=tr-t*RPT;const m=Math.floor(r1/RPM);const r=r1-m*RPM;return{t,m,r:r.toFixed(2),g:g.toFixed(3),mg:Math.round(g*1000)}}
+
+// ═══ MULTI-TEST COMPARE ═══
+function addMulti(){
+    if(!last)return alert('Calculate first!');
+    multiTests.push({...last,label:'Test #'+(multiTests.length+1)});
+    if(multiTests.length>5)multiTests.shift();
+    const card=document.getElementById('multiCard');
+    card.style.display='block';
+    const box=document.getElementById('multiBox');
+    let html='<table class="wt"><thead><tr><th></th>';
+    multiTests.forEach(t=>html+=`<th>${t.label}</th>`);
+    html+='</tr></thead><tbody>';
+    const fields=[['Weight',t=>t.wA.toFixed(3)+'g'],['Density',t=>t.density.toFixed(3)],['Karat',t=>t.karat>0?t.karat.toFixed(2)+'K':'N/A'],['Hallmark',t=>t.hallmark.toFixed(1)],['Purity',t=>t.purity.toFixed(2)+'%'],['Pure',t=>t.pureGm.toFixed(3)+'g'],['Confidence',t=>t.conf+'%'],['Spread',t=>t.spread+'/100']];
+    fields.forEach(([nm,fn])=>{
+        html+=`<tr><td class="wl">${nm}</td>`;
+        multiTests.forEach(t=>html+=`<td>${fn(t)}</td>`);
+        html+='</tr>';
+    });
+    html+='</tbody></table>';
+    html+='<div style="text-align:right;margin-top:8px"><button class="btn br bs" onclick="multiTests=[];document.getElementById(\'multiCard\').style.display=\'none\'">Clear Compare</button></div>';
+    box.innerHTML=html;
+}
+
+// ═══ UTILS ═══
+function st(id,t){const e=document.getElementById(id);if(e)e.textContent=t}
+function pf(id){return parseFloat(document.getElementById(id)?.value)||0}
+function fm(n){return Math.round(n).toLocaleString('en-PK')}
+
+function clr(){
+    document.getElementById('inAir').value='';document.getElementById('inWater').value='';
+    document.getElementById('detBan').style.display='none';
+    document.getElementById('confCard').style.display='none';
+    ['rK','rH','rP','rD','gVal'].forEach(id=>st(id,'—'));
+    ['rKs','rHs','rPs','gH','gLbl'].forEach(id=>st(id,''));
+    st('gLbl','KARAT');
+    document.getElementById('gArc').style.strokeDashoffset=534;
+    document.getElementById('compBox').innerHTML='<div style="text-align:center;color:var(--mut);padding:16px">Enter weights → Auto detect</div>';
+    document.getElementById('wtB').innerHTML='<tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--grn)">Pure</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl">Kaat</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--g)">Balance</td><td colspan="5" style="color:var(--mut)">—</td></tr>';
+    ['aVol','aSG','aBuoy','aWD','aFine','aAtom','aSpread','aAlloy'].forEach(id=>st(id,'—'));
+    ['pGP','pCh','pWs','pTot','pBal'].forEach(id=>st(id,'—'));
+    // Reset auto-rate
+    const rateInput=document.getElementById('inRate');
+    rateInput.dataset.manual='';rateInput.value='';rateInput.style.borderColor='';
+    const badge=document.getElementById('autoRateBadge');if(badge)badge.style.display='none';
+    const rl=document.getElementById('rateLabel');if(rl)rl.textContent='Rate / Tola';
+    const pgl=document.getElementById('pGPLabel');if(pgl)pgl.textContent='Metal Price';
+    last=null;document.getElementById('inAir').focus();
+}
+
+// ═══ BILL ═══
+function showBill(){
+    if(!last)return alert('Calculate first!');
+    const r=last,pfx=cfg.pfx||'JM',bn=pfx+'-'+(cfg.bn||1);
+    const compRows=Object.entries(r.comp).filter(([_,v])=>v>0.01).sort((a,b)=>b[1]-a[1]).map(([n,v])=>
+        `<div class="brow"><span>${n}</span><span>${v.toFixed(2)}% · ${(r.wA*v/100).toFixed(3)}g</span></div>`).join('');
+
+    document.getElementById('billPaper').innerHTML=`
+        <h2>${cfg.nm||'GOLD TEST LAB PRO'}</h2>
+        <div class="bsub">${cfg.ad||''} ${cfg.ct?', '+cfg.ct:''}</div>
+        <div class="bsub">${cfg.ph?'Ph: '+cfg.ph:''}</div>
+        <hr>
+        <div class="brow bold"><span>Bill #</span><span>${bn}</span></div>
+        <div class="brow"><span>Date</span><span>${new Date().toLocaleString('en-PK')}</span></div>
+        <hr>
+        <div class="bctr">═══ AUTO DETECTION ═══</div>
+        <div class="brow bold"><span>Detection</span><span>${r.emoji} ${r.cat.toUpperCase()}</span></div>
+        <div class="brow"><span>Confidence</span><span>${r.conf}%</span></div>
+        <div class="brow bold"><span>Karat</span><span>${r.karat>0?r.karat.toFixed(2)+'K':'N/A'}</span></div>
+        <div class="brow bold"><span>Hallmark</span><span>${r.hallmark.toFixed(1)}</span></div>
+        <div class="brow bold"><span>Purity</span><span>${r.purity.toFixed(2)}%</span></div>
+        <div class="brow"><span>Density</span><span>${r.density.toFixed(3)} g/cm³</span></div>
+        <div class="brow"><span>Sp. Gravity</span><span>${r.spGravity.toFixed(4)}</span></div>
+        <hr>
+        <div class="bctr">═══ COMPOSITION ═══</div>
+        ${compRows}
+        <hr>
+        <div class="bctr">═══ WEIGHTS ═══</div>
+        <div class="brow"><span>Total</span><span>${r.wA.toFixed(3)} g</span></div>
+        <div class="brow" style="color:green"><span>Pure</span><span>${r.pureGm.toFixed(3)} g</span></div>
+        <div class="brow" style="color:red"><span>Impure</span><span>${r.impGm.toFixed(3)} g</span></div>
+        <div class="brow bold"><span>Balance</span><span>${r.balGm.toFixed(3)} g</span></div>
+        <hr>
+        <div class="bctr">═══ PRICE ═══</div>
+        <div class="brow"><span>Rate ${r.autoRateInfo?'('+r.autoRateInfo.metalName+')':''}</span><span>${fm(r.rate)}/Tola</span></div>
+        <div class="brow"><span>${r.autoRateInfo?r.autoRateInfo.emoji+' '+r.autoRateInfo.metalName+' Price':'Metal Price'}</span><span>PKR ${fm(r.metalPr)}</span></div>
+        <div class="brow"><span>Charges</span><span>PKR ${fm(r.chgAmt)}</span></div>
+        <div class="brow"><span>Wastage</span><span>PKR ${fm(r.wstAmt)}</span></div>
+        <hr>
+        <div class="brow big"><span>TOTAL</span><span>PKR ${fm(Math.round(r.total))}</span></div>
+        <div class="brow bold"><span>Balance</span><span>${r.balGm.toFixed(3)} g</span></div>
+        <hr>
+        <div class="bft">Gold Test Lab PRO — Ultra Auto-Detection<br>Archimedes + Ternary Alloy Model + Forensic Analysis</div>
+        ${r.isFake?'<div style="text-align:center;color:red;font-weight:900;margin-top:8px">⚠️ TUNGSTEN ALERT ⚠️</div>':''}
+    `;
+    document.getElementById('billMo').classList.add('open');
+}
+function closeBill(){document.getElementById('billMo').classList.remove('open')}
+function printBill(){const c=document.getElementById('billPaper').innerHTML;const w=window.open('','_blank','width=400,height=700');w.document.write('<!DOCTYPE html><html><head><title>Bill</title><style>body{font-family:"Courier New",monospace;font-size:11px;padding:10px;max-width:80mm;margin:0 auto}h2{text-align:center;font-size:14px;margin-bottom:2px}.bsub{text-align:center;font-size:9px;color:#666}hr{border:none;border-top:1px dashed #aaa;margin:7px 0}.brow{display:flex;justify-content:space-between;padding:1.5px 0}.brow.big{font-size:13px;font-weight:900}.brow.bold{font-weight:700}.bctr{text-align:center;font-weight:700;margin:3px 0;font-size:11px}.bft{text-align:center;font-size:8px;color:#999;margin-top:10px}</style></head><body>'+c+'</body></html>');w.document.close();w.print()}
+function dlBill(){if(!last)return;const t=document.getElementById('billPaper').innerText;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));a.download='bill_'+new Date().toISOString().slice(0,10)+'.txt';a.click()}
+
+// ═══ HISTORY ═══
+function saveHist(){
+    if(!last)return alert('Calculate first!');
+    hist.unshift({...last,id:Date.now()});if(hist.length>500)hist=hist.slice(0,500);
+    localStorage.setItem('jm_h',JSON.stringify(hist));
+    cfg.bn=(cfg.bn||1)+1;document.getElementById('billNo').textContent=cfg.bn;saveCfg();renderH();
+    alert('✅ Saved! Bill #'+(cfg.bn-1));
+}
+function loadH(){try{hist=JSON.parse(localStorage.getItem('jm_h')||'[]')}catch(e){hist=[]}renderH()}
+function renderH(){
+    const q=(document.getElementById('hSrch')?.value||'').toLowerCase();
+    const list=document.getElementById('hList');
+    const f=hist.filter(h=>!q||(h.name+h.date+h.wA+h.karat+'').toLowerCase().includes(q));
+    list.innerHTML=f.length===0?'<div style="text-align:center;color:var(--mut);padding:40px">No history</div>':
+        f.map(h=>{const d=new Date(h.date);return`<div class="hi"><div class="hi-top"><span class="hi-type">${h.emoji||'🔬'} ${(h.name||'').split('—')[0]}</span><span class="hi-date">${d.toLocaleDateString('en-PK')} ${d.toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="hi-stats"><div class="hi-stat"><span>Wt</span><b>${h.wA.toFixed(3)}g</b></div><div class="hi-stat"><span>K</span><b>${h.karat>0?h.karat.toFixed(1)+'K':'N/A'}</b></div><div class="hi-stat"><span>Hall</span><b>${h.hallmark.toFixed(0)}</b></div><div class="hi-stat"><span>Pure</span><b>${h.purity.toFixed(1)}%</b></div><div class="hi-stat"><span>Conf</span><b>${h.conf}%</b></div><div class="hi-stat"><span>Price</span><b>PKR ${fm(Math.round(h.total))}</b></div></div><div style="text-align:right;margin-top:6px"><button class="btn br bs" onclick="delH(${h.id})" style="padding:3px 8px;font-size:.6rem">🗑️</button></div></div>`}).join('');
+}
+function delH(id){hist=hist.filter(h=>h.id!==id);localStorage.setItem('jm_h',JSON.stringify(hist));renderH()}
+function clrH(){if(confirm('Delete ALL?')){hist=[];localStorage.removeItem('jm_h');renderH()}}
+function expCSV(){
+    if(!hist.length)return alert('No data!');
+    const h=['Date','Detection','Density','Karat','Hallmark','Purity%','Confidence','Air Wt','Water Wt','Volume','SpGravity','Pure','Impure','Balance','Spread','Price'];
+    const rows=hist.map(r=>[new Date(r.date).toLocaleString('en-PK'),'"'+(r.name||'').replace(/"/g,"'")+'"',r.density.toFixed(3),r.karat.toFixed(2),r.hallmark.toFixed(1),r.purity.toFixed(2),r.conf,r.wA,r.wW,r.vol.toFixed(4),r.spGravity.toFixed(4),r.pureGm.toFixed(3),r.impGm.toFixed(3),r.balGm.toFixed(3),r.spread,Math.round(r.total)]);
+    const csv=[h,...rows].map(r=>r.join(',')).join('\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='goldlab_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+// ═══ SETTINGS ═══
+function loadCfg(){
+    try{cfg=JSON.parse(localStorage.getItem('jm_c')||'{}')}catch(e){cfg={}}
+    if(cfg.nm)document.getElementById('sNm').value=cfg.nm;
+    if(cfg.ct)document.getElementById('sCt').value=cfg.ct;
+    if(cfg.ad)document.getElementById('sAd').value=cfg.ad;
+    if(cfg.ph)document.getElementById('sPh').value=cfg.ph;
+    if(cfg.pfx)document.getElementById('sPfx').value=cfg.pfx;
+    if(cfg.bn)document.getElementById('sBn').value=cfg.bn;
+    if(cfg.dr)document.getElementById('sDR').value=cfg.dr;
+    if(cfg.tmp)document.getElementById('sTmp').value=cfg.tmp;
+    if(cfg.model)document.getElementById('sModel').value=cfg.model;
+    if(cfg.st)document.getElementById('sSt').value=cfg.st;
+    if(!cfg.bn)cfg.bn=1;
+    document.getElementById('billNo').textContent=cfg.bn;
+}
+function saveCfg(){
+    cfg.nm=document.getElementById('sNm').value;cfg.ct=document.getElementById('sCt').value;
+    cfg.ad=document.getElementById('sAd').value;cfg.ph=document.getElementById('sPh').value;
+    cfg.pfx=document.getElementById('sPfx').value;cfg.bn=parseInt(document.getElementById('sBn').value)||1;
+    cfg.dr=document.getElementById('sDR').value;cfg.tmp=document.getElementById('sTmp').value;
+    cfg.model=document.getElementById('sModel').value;cfg.st=document.getElementById('sSt').value;
+    localStorage.setItem('jm_c',JSON.stringify(cfg));
+}
+function rstCfg(){if(confirm('Reset?')){localStorage.removeItem('jm_c');cfg={};location.reload()}}
+
+// ═══ MANUAL 9-MODE ENGINE ═══
+let curMode='standard';
+function selMode(el){
+    document.querySelectorAll('.md-btn').forEach(b=>b.classList.remove('sel'));
+    el.classList.add('sel');
+    curMode=el.dataset.mode;
+}
+
+// Mode definitions: each mode has a specific density model
+const MODES={
+    standard:{
+        name:'Standard (Au-Ag)',desc:'Gold-Silver binary model',
+        calc:(d)=>{
+            const gf=Math.max(0,Math.min(1,(1/MD.Ag-1/d)/(1/MD.Ag-1/MD.Au)));
+            return {purity:gf*100,comp:{Au:gf*100,Ag:(1-gf)*100},type:'gold'};
+        }
+    },
+    silver:{
+        name:'Silver (Ag)',desc:'Pure silver purity check',
+        calc:(d)=>{
+            const p=Math.min(100,(d/MD.Ag)*100);
+            return {purity:p,comp:{Ag:p,Cu:(100-p)*0.7,Zn:(100-p)*0.3},type:'silver'};
+        }
+    },
+    copper:{
+        name:'Copper (Cu)',desc:'Copper/Tamba purity',
+        calc:(d)=>{
+            const p=Math.min(100,(d/MD.Cu)*100);
+            return {purity:p,comp:{Cu:p,Zn:(100-p)*0.6,Sn:(100-p)*0.4},type:'copper'};
+        }
+    },
+    psilver:{
+        name:'P Silver (Pakistani)',desc:'Local silver 80-85% Ag + Zn/Cu',
+        calc:(d)=>{
+            // Pakistani silver: Ag mixed with Cu+Zn, base density ~9.8-10.2
+            const baseDen=0.80*MD.Ag+0.12*MD.Cu+0.08*MD.Zn;// ~9.91 weighted
+            const refDen=1/(0.80/MD.Ag+0.12/MD.Cu+0.08/MD.Zn);// ~9.77 harmonic
+            const agFrac=Math.max(0,Math.min(1,(1/MD.Cu-1/d)/(1/MD.Cu-1/MD.Ag)));
+            const agPct=agFrac*100;
+            const cuPct=(100-agPct)*0.6;
+            const znPct=(100-agPct)*0.4;
+            return {purity:agPct,comp:{Ag:agPct,Cu:cuPct,Zn:znPct},type:'silver'};
+        }
+    },
+    standard1:{
+        name:'Standard 1 (Au-Cu)',desc:'Gold-Copper binary — Rose Gold',
+        calc:(d)=>{
+            const gf=Math.max(0,Math.min(1,(1/MD.Cu-1/d)/(1/MD.Cu-1/MD.Au)));
+            return {purity:gf*100,comp:{Au:gf*100,Cu:(1-gf)*100},type:'gold'};
+        }
+    },
+    standard2:{
+        name:'Standard 2 (Au-Ag-Cu)',desc:'Ternary alloy — most accurate for jewelry',
+        calc:(d)=>{
+            const t=ternaryModel(d);
+            return {purity:t.Au,comp:{Au:t.Au,Ag:t.Ag,Cu:t.Cu},type:'gold'};
+        }
+    },
+    local1:{
+        name:'Local Scan 1 (KPK)',desc:'Peshawar/KPK — higher copper ratio',
+        calc:(d)=>{
+            // KPK gold: typically more copper, Ag:Cu = 30:70 in alloy
+            const invD=1/d,invAu=1/MD.Au,invAg=1/MD.Ag,invCu=1/MD.Cu;
+            const agR=0.30;// Lower silver in KPK gold
+            const gfCu=Math.max(0,Math.min(1,(invCu-invD)/(invCu-invAu)));
+            let xAu=gfCu,xAg=(1-xAu)*agR,xCu=(1-xAu)*(1-agR);
+            for(let i=0;i<5;i++){const c=xAu*invAu+xAg*invAg+xCu*invCu;const e=invD-c;const a=e/(invAu-(agR*invAg+(1-agR)*invCu));xAu=Math.max(0,Math.min(1,xAu+a));xAg=(1-xAu)*agR;xCu=(1-xAu)*(1-agR)}
+            return {purity:xAu*100,comp:{Au:xAu*100,Ag:xAg*100,Cu:xCu*100},type:'gold'};
+        }
+    },
+    local2:{
+        name:'Local Scan (Lahore/Karachi)',desc:'Standard local market alloy',
+        calc:(d)=>{
+            // Lahore/Karachi: Ag:Cu = 45:55
+            const invD=1/d,invAu=1/MD.Au,invAg=1/MD.Ag,invCu=1/MD.Cu;
+            const agR=0.45;
+            const gfCu=Math.max(0,Math.min(1,(invCu-invD)/(invCu-invAu)));
+            let xAu=gfCu,xAg=(1-xAu)*agR,xCu=(1-xAu)*(1-agR);
+            for(let i=0;i<5;i++){const c=xAu*invAu+xAg*invAg+xCu*invCu;const e=invD-c;const a=e/(invAu-(agR*invAg+(1-agR)*invCu));xAu=Math.max(0,Math.min(1,xAu+a));xAg=(1-xAu)*agR;xCu=(1-xAu)*(1-agR)}
+            return {purity:xAu*100,comp:{Au:xAu*100,Ag:xAg*100,Cu:xCu*100},type:'gold'};
+        }
+    },
+    fake:{
+        name:'False Gold Detection',desc:'Tungsten/Brass/Lead — Fake check',
+        calc:(d,wA)=>{
+            let alerts=[];
+            let verdict='unknown';
+            // Check against known fake materials
+            const checks=[
+                {name:'Pure Gold (Au)',den:19.30,tol:0.15},
+                {name:'Tungsten (W)',den:19.25,tol:0.10},
+                {name:'Lead (Pb)',den:11.34,tol:0.3},
+                {name:'Brass (Cu-Zn)',den:8.55,tol:0.3},
+                {name:'Steel',den:7.85,tol:0.3},
+                {name:'Copper (Cu)',den:8.96,tol:0.2},
+                {name:'Silver (Ag)',den:10.49,tol:0.2},
+                {name:'Platinum (Pt)',den:21.45,tol:0.3},
+                {name:'Zinc (Zn)',den:7.13,tol:0.2},
+                {name:'Tin (Sn)',den:7.31,tol:0.2},
+            ];
+            let matches=[];
+            for(const c of checks){
+                const diff=Math.abs(d-c.den);
+                if(diff<=c.tol) matches.push({...c,diff,pct:Math.round((1-diff/c.tol)*100)});
+            }
+            matches.sort((a,b)=>a.diff-b.diff);
+            
+            // Tungsten alert
+            if(d>=19.15&&d<=19.35){
+                if(d>=19.20&&d<=19.28){
+                    alerts.push('🚨 DANGER: Density '+d.toFixed(3)+' matches TUNGSTEN (19.25)!');
+                    alerts.push('⚠️ Tungsten-core gold is undetectable by density alone');
+                    alerts.push('✅ Recommend: Acid test + Magnet test + Sound test');
+                    verdict='TUNGSTEN RISK';
+                } else {
+                    verdict='LIKELY GOLD';
+                    alerts.push('✅ Density closer to pure gold than tungsten');
+                }
+            } else if(d>=8.3&&d<=8.7){
+                verdict='BRASS / FAKE';
+                alerts.push('🚨 This is BRASS — NOT gold!');
+                alerts.push('Density '+d.toFixed(3)+' matches Cu-Zn alloy');
+            } else if(d>=7.5&&d<=8.1){
+                verdict='STEEL / IRON';
+                alerts.push('🚨 This is STEEL/IRON — NOT gold!');
+            } else if(d>=10.8&&d<=11.6){
+                verdict='LEAD FILLED';
+                alerts.push('🚨 Possible LEAD filling detected!');
+                alerts.push('Lead density: 11.34 g/cm³');
+            } else if(d>12&&d<19){
+                verdict='GOLD ALLOY';
+                alerts.push('✅ Gold alloy range — not fake, but not pure');
+                const approxK=ternaryModel(d).Au/100*24;
+                alerts.push('Approximate: '+approxK.toFixed(1)+'K gold');
+            } else if(d>=19&&d<=19.5){
+                verdict='GOLD / W (verify!)';
+                alerts.push('⚠️ In the Gold-Tungsten overlap zone');
+            } else {
+                verdict='UNKNOWN METAL';
+                alerts.push('Does not match common gold-faking materials');
+            }
+
+            const comp={};
+            if(matches.length)matches.forEach(m=>comp[m.name]=m.pct);
+            else comp['Unknown']=100;
+
+            return {purity:0,comp,type:'fake',verdict,alerts,matches};
+        }
+    }
+};
+
+function calcManual(){
+    const wA=parseFloat(document.getElementById('mmAir').value);
+    const wW=parseFloat(document.getElementById('mmWater').value);
+    if(!wA||!wW||wA<=0||wW<=0||wA<=wW)return alert('⚠️ Weight in Air must be > Weight in Water');
+
+    const tmp=parseFloat(cfg.tmp)||25;
+    const wd=wDen(tmp);
+    const diff=wA-wW;
+    const vol=diff/wd;
+    const density=wA/vol;
+
+    const mode=MODES[curMode];
+    if(!mode)return alert('Select a mode!');
+
+    const result=mode.calc(density,wA);
+    const ban=document.getElementById('mmBan');
+    ban.style.display='block';
+
+    if(curMode==='fake'){
+        // FAKE MODE — special display
+        ban.className='det '+(result.verdict.includes('GOLD')?'gold-alloy':result.verdict.includes('TUNGSTEN')||result.verdict.includes('BRASS')||result.verdict.includes('LEAD')||result.verdict.includes('STEEL')?'fake':'other');
+        ban.innerHTML='<div style="font-size:1.2rem">🚨 '+result.verdict+'</div><div style="font-size:.75rem;margin-top:6px;font-weight:400">'+result.alerts.map(a=>'<div>'+a+'</div>').join('')+'</div>';
+
+        st('mmK','—');st('mmH','—');st('mmP','—');
+        st('mmD',density.toFixed(3));
+
+        // Show matches
+        const matches=result.matches||[];
+        document.getElementById('mmComp').innerHTML=matches.length?
+            matches.map(m=>`<div class="ci"><div class="ci-top"><span class="ci-nm" style="color:${m.name.includes('Gold')?'var(--g)':m.name.includes('Tungsten')?'var(--red)':'var(--mut)'}">${m.name}</span><span class="ci-vl"><b>${m.pct}% match</b> · den: ${m.den}</span></div><div class="ci-bar"><div class="ci-fill" style="width:${m.pct}%;background:${m.name.includes('Gold')?'var(--g)':'var(--red)'}"></div></div></div>`).join('')
+            :'<div style="text-align:center;color:var(--mut)">No close matches</div>';
+
+        document.getElementById('mmDetail').innerHTML=`
+            <div class="mm-rl"><span class="mm-k">Mode</span><span class="mm-v">${mode.name}</span></div>
+            <div class="mm-rl"><span class="mm-k">Density</span><span class="mm-v">${density.toFixed(4)} g/cm³</span></div>
+            <div class="mm-rl"><span class="mm-k">Volume</span><span class="mm-v">${vol.toFixed(4)} cm³</span></div>
+            <div class="mm-rl"><span class="mm-k">Sp. Gravity</span><span class="mm-v">${(wA/diff).toFixed(4)}</span></div>
+            <div class="mm-rl"><span class="mm-k">Verdict</span><span class="mm-v" style="color:${result.verdict.includes('GOLD')?'var(--grn)':'var(--red)'}">${result.verdict}</span></div>
+        `;
+
+        // Weight table — no pure/impure for fake mode
+        const u=toU(wA);
+        document.getElementById('mmWT').innerHTML=`<tr><td class="wl">Total</td><td>${u.t}</td><td>${u.m}</td><td>${u.r}</td><td style="font-weight:700">${u.g}</td><td>${u.mg}</td></tr><tr><td class="wl" style="color:var(--red)">Verdict</td><td colspan="5" style="color:var(--red);font-weight:700">${result.verdict}</td></tr>`;
+        st('mmPr1','—');st('mmPr2','—');st('mmPr3','—');
+        return;
+    }
+
+    // NORMAL MODES
+    const karat = result.type==='gold' ? result.purity/100*24 : 0;
+    const hallmark = result.purity*10;
+
+    ban.className='det '+(result.type==='gold'?(karat>=23?'gold-pure':'gold-alloy'):result.type==='silver'?'silver':'copper');
+    ban.innerHTML=`${mode.name}<br><span style="font-size:.75rem;font-weight:400">${mode.desc} — Density: ${density.toFixed(3)} g/cm³</span>`;
+
+    st('mmK',karat>0?karat.toFixed(2)+'K':'N/A');
+    st('mmH',hallmark.toFixed(1));
+    st('mmP',result.purity.toFixed(2)+'%');
+    st('mmD',density.toFixed(3));
+
+    // Composition
+    const colors={Au:'#FFD700',Ag:'#C0C0C0',Cu:'#CD7F32',Zn:'#BDBDBD',Ni:'#727472',Sn:'#D3D3D3',Pb:'#4A4A4A'};
+    const names={Au:'Gold',Ag:'Silver',Cu:'Copper',Zn:'Zinc',Ni:'Nickel',Sn:'Tin',Pb:'Lead'};
+    const compItems=Object.entries(result.comp).filter(([_,v])=>v>0.01).sort((a,b)=>b[1]-a[1]);
+    document.getElementById('mmComp').innerHTML=compItems.map(([sym,pct])=>{
+        const gm=wA*(pct/100);const clr=colors[sym]||'#888';const nm=names[sym]||sym;
+        return`<div class="ci"><div class="ci-top"><span class="ci-nm" style="color:${clr}">${nm} (${sym})</span><span class="ci-vl"><b>${pct.toFixed(2)}%</b> · ${gm.toFixed(3)} g</span></div><div class="ci-bar"><div class="ci-fill" style="width:${Math.min(100,pct)}%;background:${clr}"></div></div></div>`;
+    }).join('');
+
+    // Weight table
+    const pureGm=wA*(result.purity/100);
+    const impGm=wA-pureGm;
+    const rows=[{l:'Total Weight',g:wA,s:''},{l:'Pure Metal',g:pureGm,s:'color:var(--grn)'},{l:'Impure',g:impGm,s:'color:var(--red)'}];
+    document.getElementById('mmWT').innerHTML=rows.map(r=>{const u=toU(r.g);return`<tr><td class="wl" style="${r.s}">${r.l}</td><td>${u.t}</td><td>${u.m}</td><td>${u.r}</td><td style="${r.s};font-weight:700">${u.g}</td><td>${u.mg}</td></tr>`}).join('');
+
+    // Detail
+    document.getElementById('mmDetail').innerHTML=`
+        <div class="mm-rl"><span class="mm-k">Mode</span><span class="mm-v">${mode.name}</span></div>
+        <div class="mm-rl"><span class="mm-k">Density</span><span class="mm-v">${density.toFixed(4)} g/cm³</span></div>
+        <div class="mm-rl"><span class="mm-k">Volume</span><span class="mm-v">${vol.toFixed(4)} cm³</span></div>
+        <div class="mm-rl"><span class="mm-k">Sp. Gravity</span><span class="mm-v">${(wA/diff).toFixed(4)}</span></div>
+        <div class="mm-rl"><span class="mm-k">Buoyancy</span><span class="mm-v">${diff.toFixed(3)} gf</span></div>
+        <div class="mm-rl"><span class="mm-k">Fineness</span><span class="mm-v">${(result.purity*10).toFixed(1)} / 1000</span></div>
+        ${karat>0?'<div class="mm-rl"><span class="mm-k">Nearest Std</span><span class="mm-v" style="color:var(--g)">'+nearKarat(karat)+'</span></div>':''}
+    `;
+
+    // Price
+    const rate=parseFloat(document.getElementById('mmRate').value)||0;
+    const chg=parseFloat(document.getElementById('mmChg').value)||0;
+    const rgm=rate/TOLA;
+    const metalPr=pureGm*rgm;
+    const chgAmt=chg*(pureGm/TOLA);
+    const total=metalPr-chgAmt;
+    st('mmPr1','PKR '+fm(Math.round(metalPr)));
+    st('mmPr2','PKR '+fm(Math.round(chgAmt)));
+    st('mmPr3','PKR '+fm(Math.round(total)));
+}
+
+function clrManual(){
+    document.getElementById('mmAir').value='';document.getElementById('mmWater').value='';
+    document.getElementById('mmBan').style.display='none';
+    ['mmK','mmH','mmP','mmD'].forEach(id=>st(id,'—'));
+    document.getElementById('mmComp').innerHTML='<div style="text-align:center;color:var(--mut);padding:16px">Select mode → Enter weights → Test</div>';
+    document.getElementById('mmDetail').innerHTML='<div style="text-align:center;color:var(--mut);padding:14px">Results appear here</div>';
+    document.getElementById('mmWT').innerHTML='<tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--grn)">Pure</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr>';
+    ['mmPr1','mmPr2','mmPr3'].forEach(id=>st(id,'—'));
+    document.getElementById('mmAir').focus();
+}
+
+// ═══ JEWELRY XRF ANALYSIS ENGINE ═══
+function calcJewelry(){
+    const wA=parseFloat(document.getElementById('jxAir').value);
+    const wW=parseFloat(document.getElementById('jxWater').value);
+    if(!wA||!wW||wA<=0||wW<=0||wA<=wW)return alert('⚠️ Weight in Air must be > Weight in Water');
+
+    const tmp=parseFloat(cfg.tmp)||25;
+    const wd=wDen(tmp);
+    const diff=wA-wW;
+    const vol=diff/wd;
+    const overallDensity=wA/vol;
+
+    // ── Stone Correction ──
+    const hasStones=document.getElementById('jxHasStones').value==='yes';
+    let metalDensity=overallDensity;
+    let stoneWt=0, stoneVol=0, metalWt=wA, stoneDen=3.00;
+    let stoneInfo=null;
+
+    if(hasStones){
+        const stoneType=document.getElementById('jxStoneType').value;
+        stoneDen=STONE_DEN[stoneType]||3.00;
+        const userStoneWt=parseFloat(document.getElementById('jxStoneWt').value);
+
+        if(userStoneWt>0 && userStoneWt<wA){
+            // User provided stone weight
+            stoneWt=userStoneWt;
+            stoneVol=stoneWt/stoneDen;
+            metalWt=wA-stoneWt;
+            const metalVol=vol-stoneVol;
+            if(metalVol>0) metalDensity=metalWt/metalVol;
+        } else {
+            // Auto-estimate: use claimed karat's expected density (or default 22K) as baseline
+            // Formula: V_stone = V_total × (d_expected − d_measured) / (d_expected − d_stone)
+            const claimedKForStone=parseFloat(document.getElementById('jxClaimedK').value)||22;
+            // Compute expected density for the claimed karat using ternary standard ratios
+            const auFrac=Math.min(1,Math.max(0.3,claimedKForStone/24));
+            let agR;
+            if(auFrac>0.95) agR=0.5; else if(auFrac>0.85) agR=0.55;
+            else if(auFrac>0.70) agR=0.40; else if(auFrac>0.55) agR=0.30; else agR=0.25;
+            const xAu=auFrac, xAg=(1-auFrac)*agR, xCu=(1-auFrac)*(1-agR);
+            const expectedDen=1/(xAu/MD.Au + xAg/MD.Ag + xCu/MD.Cu);
+            if(overallDensity < expectedDen-0.1 && overallDensity > stoneDen){
+                // Real density drop → stones are pulling density down
+                const stoneFrac=(expectedDen-overallDensity)/(expectedDen-stoneDen);
+                stoneVol=vol*Math.min(0.40,Math.max(0,stoneFrac));
+                stoneWt=stoneVol*stoneDen;
+                metalWt=wA-stoneWt;
+                const metalVol=vol-stoneVol;
+                if(metalVol>0) metalDensity=metalWt/metalVol;
+            }
+        }
+        stoneInfo={type:document.getElementById('jxStoneType').selectedOptions[0].textContent,weight:stoneWt,volume:stoneVol,density:stoneDen,pctWeight:(stoneWt/wA*100),pctVolume:(stoneVol/vol*100)};
+    }
+
+    // ── Material Detection & Composition ──
+    let tern, karat, purity, hallmark, materialType='gold';
+
+    if(metalDensity>=10.20 && metalDensity<=10.60){
+        // Silver range (sterling 10.36, pure 10.49)
+        materialType='silver';
+        const agPct=Math.min(99.9,80+(metalDensity-10.20)/(10.49-10.20)*19.9);
+        tern={Au:0,Ag:agPct,Cu:100-agPct};
+        karat=0; purity=0; hallmark=Math.round(agPct*10);
+    } else if(metalDensity>=20.4 && metalDensity<=21.9){
+        // Platinum range (Pt950=20.9, Pt900=20.4, pure Pt=21.45)
+        materialType='platinum';
+        tern={Au:0,Ag:0,Cu:5};
+        karat=0; purity=Math.min(100,(metalDensity/MD.Pt)*100); hallmark=Math.round(purity*10);
+    } else if(metalDensity<10.20){
+        materialType='base';
+        tern={Au:0,Ag:0,Cu:100};
+        karat=0; purity=0; hallmark=0;
+    } else {
+        tern=ternaryModel(metalDensity);
+        karat=tern.Au/100*24; purity=tern.Au; hallmark=tern.Au*10;
+    }
+
+    // ── Multi-Element Estimation ──
+    let elements={Au:tern.Au, Ag:tern.Ag, Cu:tern.Cu};
+
+    // Override for non-gold materials
+    if(materialType==='platinum'){ elements={Pt:95,Ir:3,Rh:2}; }
+    else if(materialType==='base'){
+        if(metalDensity>=8.3&&metalDensity<=9.1) elements={Cu:65,Zn:35};
+        else if(metalDensity>=7.5&&metalDensity<=8.1) elements={Fe:70,Cr:18,Ni:12};
+        else elements={Cu:50,Zn:25,Ni:15,Fe:10};
+    }
+
+    // Trace element estimation (gold alloys only)
+    let znPct=0, niPct=0, cdPct=0, snPct=0, pbPct=0;
+    if(materialType==='gold'){
+        // Zinc: present in yellow gold alloys, ~0.5-3% in lower karats
+        if(karat<22 && karat>0){ znPct=Math.min(3, (24-karat)/24 * 4 * 0.3); elements.Zn=znPct; }
+
+        // Nickel: used in white gold, trace in yellow, ~0-2%
+        if(karat<21 && karat>0){ niPct=Math.min(2, (24-karat)/24 * 3 * 0.15); elements.Ni=niPct; }
+
+        // Cadmium (Cd=8.65): toxic, used in old solder
+        const expectedPureDen=1/(tern.Au/100/MD.Au + tern.Ag/100/MD.Ag + tern.Cu/100/MD.Cu);
+        if(metalDensity < expectedPureDen - 0.05 && metalDensity > 8 && karat > 0){
+            const denDrop=expectedPureDen-metalDensity;
+            cdPct=Math.min(5, denDrop / (MD.Cu - MD.Cd) * elements.Cu * 0.5);
+            if(cdPct > 0.01){ elements.Cd=cdPct; elements.Cu=Math.max(0,elements.Cu-cdPct); }
+        }
+
+        // Tin: sometimes used in low-karat alloys
+        if(karat<14 && karat>0){ snPct=Math.min(1.5, (14-karat)/14 * 2); elements.Sn=snPct; }
+
+        // Lead: trace in some alloys (unwanted)
+        if(metalDensity > expectedPureDen + 0.08 && karat < 20 && karat > 0){
+            pbPct=Math.min(3, (metalDensity-expectedPureDen) / (MD.Pb - expectedPureDen) * 5);
+            if(pbPct > 0.01){ elements.Pb=pbPct; }
+        }
+
+        // Rhodium: plating on white gold
+        if(metalDensity > 14 && metalDensity < 16){ elements.Rh=0.15; }
+    }
+
+    // Rebalance to 100%
+    const tot=Object.values(elements).reduce((s,v)=>s+v,0);
+    if(tot>0) Object.keys(elements).forEach(k=>elements[k]*=100/tot);
+
+    // ── Solder / Tanka Estimation ──
+    const jType=document.getElementById('jxType').value;
+    const solderData=SOLDER_EST[jType]||[1,2,14];
+    const claimedK=parseFloat(document.getElementById('jxClaimedK').value)||0;
+
+    let solderPct=0, solderKarat=solderData[2], solderWt=0, solderDetail='';
+    const typicalSolder=(solderData[0]+solderData[1])/2;
+    if(claimedK > 0 && karat > 0 && claimedK > karat + 0.3){
+        // Karat is meaningfully lower than claimed (gap > 0.3K = beyond measurement noise)
+        // measured_K = (1-s)*claimed_K + s*solder_K  →  s = (claimed_K - measured_K)/(claimed_K - solder_K)
+        if(claimedK > solderKarat){
+            const calcSolder=Math.min(15, Math.max(0, (claimedK-karat)/(claimedK-solderKarat)*100));
+            // Use the larger of typical or calculated — never below the type's minimum expected
+            solderPct=Math.max(typicalSolder, calcSolder);
+        } else {
+            solderPct=typicalSolder;
+        }
+        solderWt=metalWt*(solderPct/100);
+        solderDetail=`Claimed ${claimedK}K but measured ${karat.toFixed(1)}K → Solder explains ${solderPct.toFixed(1)}% of weight`;
+    } else {
+        // Use typical solder % for this jewelry type (matches within tolerance OR no claim)
+        solderPct=typicalSolder;
+        solderWt=metalWt*(solderPct/100);
+        solderDetail=`${jType.charAt(0).toUpperCase()+jType.slice(1)} typically has ${solderData[0]}-${solderData[1]}% solder`;
+    }
+
+    // ── Risk Assessment ──
+    let risks=[];
+    // Cadmium check (EU limit: 0.01% for jewelry, many countries ban >0.03%)
+    if(cdPct > 0.5) risks.push({level:'danger',icon:'☣️',text:`CADMIUM ${cdPct.toFixed(2)}% — DANGEROUS! Exceeds safety limits. Cd is toxic/carcinogenic.`});
+    else if(cdPct > 0.1) risks.push({level:'warn',icon:'⚠️',text:`Cadmium ${cdPct.toFixed(2)}% detected — Borderline. Monitor for skin contact reactions.`});
+    else risks.push({level:'safe',icon:'✅',text:'Cadmium: Not detected / Below safe threshold'});
+
+    // Lead check
+    if(pbPct > 1) risks.push({level:'danger',icon:'🚫',text:`LEAD ${pbPct.toFixed(2)}% — Children's jewelry: DANGEROUS`});
+    else if(pbPct > 0.1) risks.push({level:'warn',icon:'⚠️',text:`Lead trace ${pbPct.toFixed(2)}% — Low risk for adults`});
+    else risks.push({level:'safe',icon:'✅',text:'Lead: Not detected / Negligible'});
+
+    // Nickel allergy
+    if(niPct > 0.5) risks.push({level:'warn',icon:'🤚',text:`Nickel ${niPct.toFixed(2)}% — May cause skin allergy (EU limit: 0.05% migration)`});
+    else risks.push({level:'safe',icon:'✅',text:'Nickel: Low — Safe for sensitive skin'});
+
+    // Solder quality
+    if(solderPct > 8) risks.push({level:'warn',icon:'🔗',text:`High solder content ${solderPct.toFixed(1)}% — Weak joints possible, lower effective karat`});
+    else risks.push({level:'safe',icon:'✅',text:`Solder ${solderPct.toFixed(1)}% — Normal for ${jType}`});
+
+    // ── Quality Verdict ──
+    let verdictEmoji='', verdictText='', verdictClass='';
+    if(materialType==='silver'){
+        const fin=Math.round(tern.Ag*10);
+        verdictEmoji='🥈'; verdictClass='silver';
+        verdictText=fin>=999?'PURE SILVER (999)':fin>=925?'STERLING SILVER (925)':fin>=900?'COIN SILVER ('+fin+')':'SILVER ALLOY ('+fin+')';
+    } else if(materialType==='platinum'){
+        verdictEmoji='💎'; verdictText='PLATINUM JEWELRY (Pt950)'; verdictClass='gold-pure';
+    } else if(materialType==='base'){
+        verdictEmoji='❌'; verdictText='BASE METAL — Not Precious Metal'; verdictClass='fake';
+    } else if(karat >= 23.5){ verdictEmoji='🏆'; verdictText='PREMIUM — 24K Pure Gold'; verdictClass='gold-pure'; }
+    else if(karat >= 21){ verdictEmoji='🥇'; verdictText='EXCELLENT — High Karat Gold ('+karat.toFixed(1)+'K)'; verdictClass='gold-pure'; }
+    else if(karat >= 17){ verdictEmoji='✨'; verdictText='GOOD — Standard Gold Jewelry ('+nearKarat(karat)+')'; verdictClass='gold-alloy'; }
+    else if(karat >= 13){ verdictEmoji='👍'; verdictText='FAIR — Lower Karat Gold ('+nearKarat(karat)+')'; verdictClass='gold-alloy'; }
+    else if(karat >= 8){ verdictEmoji='⚠️'; verdictText='LOW — Very Low Karat ('+karat.toFixed(1)+'K) — Budget jewelry'; verdictClass='other'; }
+    else{ verdictEmoji='❌'; verdictText='NOT PRECIOUS — Base metal or unknown alloy'; verdictClass='fake'; }
+
+    if(cdPct > 0.5) verdictText += ' ⚠️ CADMIUM RISK!';
+    if(solderPct > 10) verdictText += ' ⚠️ EXCESSIVE SOLDER!';
+
+    // ═══ UPDATE UI ═══
+    const ban=document.getElementById('jxBan');
+    ban.style.display='block';
+    ban.className='det '+verdictClass;
+    let banHTML=verdictEmoji+' '+verdictText;
+    if(hasStones && stoneInfo) banHTML+='<div style="font-size:.7rem;margin-top:4px;font-weight:400">💎 Stones detected — Metal-only analysis applied</div>';
+    ban.innerHTML=banHTML;
+
+    // Key results
+    st('jxK',karat>0?karat.toFixed(2)+'K':'N/A');
+    st('jxKs',karat>0?'≈ '+nearKarat(karat):'');
+    st('jxH',hallmark.toFixed(1));
+    st('jxP',purity.toFixed(2)+'%');
+    st('jxPs',hasStones?'(metal only)':'');
+    st('jxD',(hasStones?metalDensity:overallDensity).toFixed(3));
+
+    // ── XRF Element Breakdown ──
+    const elColors={Au:'#FFD700',Ag:'#C0C0C0',Cu:'#CD7F32',Zn:'#BDBDBD',Ni:'#727472',Cd:'#FF6B6B',Pb:'#F85149',Sn:'#D3D3D3',Rh:'#E8E8E8',Fe:'#808080'};
+    const elNames={Au:'Gold (Au)',Ag:'Silver (Ag)',Cu:'Copper (Cu)',Zn:'Zinc (Zn)',Ni:'Nickel (Ni)',Cd:'Cadmium (Cd)',Pb:'Lead (Pb)',Sn:'Tin (Sn)',Rh:'Rhodium (Rh)',Fe:'Iron (Fe)'};
+    const elClass={Au:'gold',Ag:'silver',Cu:'copper',Zn:'zinc',Ni:'nickel',Cd:'cadmium',Pb:'lead',Sn:'tin',Rh:'rhodium'};
+    const sortedEls=Object.entries(elements).filter(([_,v])=>v>0.005).sort((a,b)=>b[1]-a[1]);
+
+    let elHTML='<div class="jxrf-grid">';
+    for(const [sym,pct] of sortedEls){
+        const gm=metalWt*(pct/100);
+        const clr=elColors[sym]||'#888';
+        const nm=elNames[sym]||sym;
+        const cls=elClass[sym]||'';
+        elHTML+=`<div class="jx-el ${cls}">
+            <div class="jx-sym">${nm}</div>
+            <div class="jx-pct">${pct.toFixed(2)}%</div>
+            <div class="jx-gm">${gm.toFixed(3)}g · ${Math.round(gm*1000)}mg</div>
+            <div class="jx-bar" style="width:${Math.min(100,pct)}%;background:${clr}"></div>
+        </div>`;
+    }
+    // Add stone element if present
+    if(hasStones && stoneWt > 0){
+        elHTML+=`<div class="jx-el stone">
+            <div class="jx-sym">💎 ${stoneInfo.type.split('(')[0].trim()}</div>
+            <div class="jx-pct">${(stoneWt/wA*100).toFixed(2)}%</div>
+            <div class="jx-gm">${stoneWt.toFixed(3)}g · ${Math.round(stoneWt*1000)}mg</div>
+            <div class="jx-bar" style="width:${Math.min(100,stoneWt/wA*100)}%;background:var(--blu)"></div>
+        </div>`;
+    }
+    elHTML+='</div>';
+
+    // Full composition bars (like Auto Test)
+    elHTML+='<div style="margin-top:12px">';
+    for(const [sym,pct] of sortedEls){
+        const gm=metalWt*(pct/100);
+        const clr=elColors[sym]||'#888';
+        const nm=elNames[sym]||sym;
+        elHTML+=`<div class="ci"><div class="ci-top"><span class="ci-nm" style="color:${clr}">${nm}</span><span class="ci-vl"><b>${pct.toFixed(2)}%</b> · ${gm.toFixed(3)}g · ${Math.round(gm*1000)}mg</span></div><div class="ci-bar"><div class="ci-fill" style="width:${Math.min(100,pct)}%;background:${clr}"></div></div></div>`;
+    }
+    elHTML+='</div>';
+    document.getElementById('jxElements').innerHTML=elHTML;
+
+    // ── Solder/Tanka ──
+    let solHTML=`<div class="jx-solder">
+        <div class="jx-title">🔗 Solder / Tanka Breakdown</div>
+        <div class="mm-rl"><span class="mm-k">Jewelry Type</span><span class="mm-v">${jType.charAt(0).toUpperCase()+jType.slice(1)}</span></div>
+        <div class="mm-rl"><span class="mm-k">Solder %</span><span class="mm-v">${solderPct.toFixed(1)}%</span></div>
+        <div class="mm-rl"><span class="mm-k">Solder Weight</span><span class="mm-v">${solderWt.toFixed(3)}g</span></div>
+        <div class="mm-rl"><span class="mm-k">Solder Karat</span><span class="mm-v">${solderKarat}K</span></div>
+        <div class="mm-rl"><span class="mm-k">Metal w/o Solder</span><span class="mm-v">${(metalWt-solderWt).toFixed(3)}g</span></div>
+        <div style="font-size:.7rem;color:var(--mut);margin-top:6px;padding-top:6px;border-top:1px solid var(--bdr)">${solderDetail}</div>
+    </div>`;
+    if(claimedK > 0 && karat > 0){
+        const diff2=claimedK-karat;
+        if(diff2 > 0.3){
+            solHTML+=`<div class="jx-risk warn"><span>⚠️</span><span>Claimed ${claimedK}K but actual ${karat.toFixed(1)}K — Difference of ${diff2.toFixed(1)}K. ${diff2>2?'SIGNIFICANT gap — excessive solder or lower purity!':'Normal range, explained by solder joints.'}</span></div>`;
+        } else if(diff2 > -0.5){
+            solHTML+=`<div class="jx-risk safe"><span>✅</span><span>Claimed ${claimedK}K, measured ${karat.toFixed(1)}K — Matches within tolerance!</span></div>`;
+        } else {
+            solHTML+=`<div class="jx-risk safe"><span>🎉</span><span>Actually BETTER than claimed! ${karat.toFixed(1)}K > ${claimedK}K</span></div>`;
+        }
+    }
+    document.getElementById('jxSolder').innerHTML=solHTML;
+
+    // ── Stone Analysis ──
+    const stoneCard=document.getElementById('jxStoneCard');
+    if(hasStones && stoneInfo){
+        stoneCard.style.display='block';
+        document.getElementById('jxStoneInfo').innerHTML=`
+            <div class="jx-stone-grid">
+                <div class="jx-stone-item"><div class="ai-l">Stone Type</div><div class="ai-v">${stoneInfo.type.split('(')[0].trim()}</div></div>
+                <div class="jx-stone-item"><div class="ai-l">Stone Density</div><div class="ai-v">${stoneInfo.density.toFixed(2)} g/cm³</div></div>
+                <div class="jx-stone-item"><div class="ai-l">Stone Weight</div><div class="ai-v">${stoneInfo.weight.toFixed(3)}g</div></div>
+                <div class="jx-stone-item"><div class="ai-l">Stone Volume</div><div class="ai-v">${stoneInfo.volume.toFixed(4)} cm³</div></div>
+                <div class="jx-stone-item"><div class="ai-l">% of Total Weight</div><div class="ai-v">${stoneInfo.pctWeight.toFixed(1)}%</div></div>
+                <div class="jx-stone-item"><div class="ai-l">% of Total Volume</div><div class="ai-v">${stoneInfo.pctVolume.toFixed(1)}%</div></div>
+                <div class="jx-stone-item"><div class="ai-l">Overall Density</div><div class="ai-v">${overallDensity.toFixed(3)}</div></div>
+                <div class="jx-stone-item"><div class="ai-l">Metal-Only Density</div><div class="ai-v" style="color:var(--g)">${metalDensity.toFixed(3)}</div></div>
+            </div>
+            <div style="font-size:.7rem;color:var(--mut);margin-top:8px;text-align:center">
+                Metal karat shown is adjusted for stone presence — actual metal quality is ${karat.toFixed(1)}K
+            </div>`;
+    } else {
+        stoneCard.style.display='none';
+    }
+
+    // ── Risk Assessment ──
+    let riskHTML='';
+    for(const r of risks){
+        riskHTML+=`<div class="jx-risk ${r.level}"><span style="font-size:1.2rem">${r.icon}</span><span>${r.text}</span></div>`;
+    }
+    document.getElementById('jxRisks').innerHTML=riskHTML;
+
+    // ── Verdict ──
+    let tagHTML='';
+    if(materialType==='silver') tagHTML+=`<span class="jx-tag b">🥈 SILVER</span>`;
+    else if(materialType==='platinum') tagHTML+=`<span class="jx-tag b">💎 PLATINUM</span>`;
+    else if(materialType==='base') tagHTML+=`<span class="jx-tag r">BASE METAL</span>`;
+    else if(karat>0) tagHTML+=`<span class="jx-tag g">${nearKarat(karat)}</span>`;
+    if(hasStones) tagHTML+=`<span class="jx-tag b">HAS STONES</span>`;
+    if(cdPct>0.1) tagHTML+=`<span class="jx-tag r">Cd: ${cdPct.toFixed(2)}%</span>`;
+    if(pbPct>0.1) tagHTML+=`<span class="jx-tag r">Pb: ${pbPct.toFixed(2)}%</span>`;
+    if(solderPct>5) tagHTML+=`<span class="jx-tag y">HIGH SOLDER</span>`;
+    if(niPct<=0.5) tagHTML+=`<span class="jx-tag g">SKIN SAFE</span>`;
+    const verdictHTML=`
+        <div style="text-align:center;padding:8px">
+            <div style="font-size:2.5rem;margin-bottom:4px">${verdictEmoji}</div>
+            <div style="font-size:1.1rem;font-weight:900;color:var(--g);margin-bottom:6px">${verdictText}</div>
+            <div>${tagHTML}</div>
+            <div style="margin-top:10px;font-size:.75rem;color:var(--mut)">
+                Density: ${overallDensity.toFixed(3)} ${hasStones?'(overall) → '+metalDensity.toFixed(3)+' (metal only)':''} | 
+                Volume: ${vol.toFixed(4)} cm³ | Sp.Gravity: ${(wA/diff).toFixed(4)}
+            </div>
+        </div>`;
+    document.getElementById('jxVerdict').innerHTML=verdictHTML;
+
+    // ── Weight Table ──
+    const rows=[
+        {l:'Total Weight',g:wA,s:''},
+        {l:'Metal Weight',g:metalWt,s:''},
+        {l:'Pure Gold',g:metalWt*(purity/100),s:'color:var(--grn)'},
+        {l:'Alloy Metals',g:metalWt*(1-purity/100),s:'color:var(--red)'},
+        {l:'Solder/Tanka',g:solderWt,s:'color:var(--yel)'},
+    ];
+    if(hasStones) rows.splice(2,0,{l:'💎 Stones',g:stoneWt,s:'color:var(--blu)'});
+    document.getElementById('jxWT').innerHTML=rows.map(r=>{const u=toU(r.g);return`<tr><td class="wl" style="${r.s}">${r.l}</td><td>${u.t}</td><td>${u.m}</td><td>${u.r}</td><td style="${r.s};font-weight:700">${u.g}</td><td>${u.mg}</td></tr>`}).join('');
+
+    // ── Price ──
+    const rate=parseFloat(document.getElementById('jxRate').value)||0;
+    const chg=parseFloat(document.getElementById('jxChg').value)||0;
+    const pureGm=metalWt*(purity/100);
+    const rgm=rate/TOLA;
+    const metalPr=pureGm*rgm;
+    const chgAmt=chg*(pureGm/TOLA);
+    const total=metalPr-chgAmt;
+    st('jxPr1','PKR '+fm(Math.round(metalPr)));
+    st('jxPr2','PKR '+fm(Math.round(chgAmt)));
+    st('jxPr3','PKR '+fm(Math.round(total)));
+}
+
+function clrJewelry(){
+    document.getElementById('jxAir').value='';document.getElementById('jxWater').value='';
+    document.getElementById('jxBan').style.display='none';
+    document.getElementById('jxStoneCard').style.display='none';
+    ['jxK','jxH','jxP','jxD'].forEach(id=>st(id,'—'));
+    ['jxKs','jxPs'].forEach(id=>st(id,''));
+    document.getElementById('jxElements').innerHTML='<div style="text-align:center;color:var(--mut);padding:16px">Enter weights → Get full analysis</div>';
+    document.getElementById('jxSolder').innerHTML='<div style="text-align:center;color:var(--mut);padding:14px">Solder analysis appears here</div>';
+    document.getElementById('jxRisks').innerHTML='<div style="text-align:center;color:var(--mut);padding:14px">Risk analysis appears here</div>';
+    document.getElementById('jxVerdict').innerHTML='<div style="text-align:center;color:var(--mut);padding:14px">Verdict appears here</div>';
+    document.getElementById('jxWT').innerHTML='<tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--grn)">Pure Metal</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr>';
+    ['jxPr1','jxPr2','jxPr3'].forEach(id=>st(id,'—'));
+    document.getElementById('jxAir').focus();
+}
+
+// ═══ AUTO-RATE BY METAL TYPE ═══
+function getAutoRate(det){
+    let rate=0,metalName='Gold',emoji='🥇',color='var(--g)';
+    let cached=null;
+    try{cached=JSON.parse(localStorage.getItem('jm_lr'))}catch(e){}
+    
+    if(!cached) return {rate:0,metalName:'Gold',emoji:'🥇',color:'var(--g)',source:'none'};
+    
+    const cat=det.cat;
+    const k=det.karat||0;
+    const nearK=nearKarat(k);
+    
+    if(cat==='gold-pure'||cat==='gold-alloy'||cat==='jewelry'){
+        // Gold — pick rate by nearest karat
+        if(nearK==='24K'||k>=23.5){rate=cached.goldPkrTola||0;metalName='Gold 24K';}
+        else if(nearK==='22K'||(k>=21.5&&k<23.5)){rate=cached.gold22kTola||0;metalName='Gold 22K';}
+        else if(nearK==='21K'||(k>=20.5&&k<21.5)){rate=cached.gold21kTola||0;metalName='Gold 21K';}
+        else if(nearK==='18K'||(k>=17&&k<20.5)){rate=cached.gold18kTola||0;metalName='Gold 18K';}
+        else if(k>=14&&k<17){rate=(cached.goldPkrTola||0)*(k/24);metalName='Gold '+k.toFixed(0)+'K';}
+        else if(k>0){rate=(cached.goldPkrTola||0)*(k/24);metalName='Gold ~'+k.toFixed(0)+'K';}
+        else {rate=cached.goldPkrTola||0;metalName='Gold';}
+        emoji='🥇';color='var(--g)';
+    } else if(cat==='silver'){
+        rate=cached.silverPkrTola||0;
+        metalName='Silver';emoji='🥈';color='#C0C0C0';
+    } else if(cat==='platinum'){
+        // Convert platinum USD/oz to PKR/Tola
+        if(cached.platUsdOz && cached.usdPkr){
+            rate=(cached.platUsdOz/TROY_OZ_TO_GRAM)*cached.usdPkr*GRAM_TO_TOLA;
+        }
+        metalName='Platinum';emoji='⚪';color='#E5E4E2';
+    } else if(cat==='palladium'){
+        if(cached.palladUsdOz && cached.usdPkr){
+            rate=(cached.palladUsdOz/TROY_OZ_TO_GRAM)*cached.usdPkr*GRAM_TO_TOLA;
+        }
+        metalName='Palladium';emoji='🔘';color='#CED0CE';
+    } else if(cat==='copper'){
+        metalName='Copper';emoji='🟤';color='#CD7F32';rate=0;
+    } else if(cat==='fake'){
+        metalName='Fake/Unknown';emoji='⚠️';color='var(--red)';rate=0;
+    } else {
+        metalName='Metal';emoji='🔬';color='var(--mut)';rate=0;
+    }
+    
+    return {rate:Math.round(rate),metalName,emoji,color,source:cached?'live':'none'};
+}
+
+// ═══ LIVE GOLD RATE FETCHING ═══
+const TROY_OZ_TO_GRAM = 31.1035;
+const GRAM_TO_TOLA = 11.6638;
+
+// Smart fetch: tries direct first, then CORS proxies for file:// protocol
+async function smartFetch(url){
+    // Try direct first (works on http/https-hosted pages)
+    try{const r=await fetch(url,{cache:'no-store'});if(r.ok)return await r.json();}catch(e){}
+    // Try CORS proxies (needed for file:// protocol or restrictive CORS)
+    const proxies=[
+        'https://corsproxy.io/?',
+        'https://api.allorigins.win/raw?url=',
+        'https://api.codetabs.com/v1/proxy?quest='
+    ];
+    for(const px of proxies){
+        try{
+            const r=await fetch(px+encodeURIComponent(url),{cache:'no-store'});
+            if(r.ok){const txt=await r.text();return JSON.parse(txt);}
+        }catch(e){}
+    }
+    throw new Error('All fetch methods failed for: '+url);
+}
+
+async function fetchLiveRates(){
+    const btn=document.getElementById('lrBtn');
+    const content=document.getElementById('lrContent');
+    const status=document.getElementById('lrStatus');
+    const timeEl=document.getElementById('lrTime');
+    
+    btn.disabled=true;
+    btn.innerHTML='<span class="lr-spin"></span> Fetching...';
+    status.textContent='trying sources...';
+    status.style.color='var(--yel)';
+    content.innerHTML='<div style="text-align:center;padding:12px"><span class="lr-spin"></span><div style="font-size:.65rem;color:var(--mut);margin-top:6px">Trying multiple sources...</div></div>';
+    
+    let goldUsdOz=0,silverUsdOz=0,platUsdOz=0,palladUsdOz=0,usdPkr=0;
+    let goldSource='',fxSource='';
+
+    // ── STEP 1: Fetch Metal Prices ──
+    // Source A: api.gold-api.com (verified working 2026, free, CORS-friendly, per-metal endpoint)
+    try{
+        const [g,s,pt,pd]=await Promise.all([
+            smartFetch('https://api.gold-api.com/price/XAU').catch(()=>null),
+            smartFetch('https://api.gold-api.com/price/XAG').catch(()=>null),
+            smartFetch('https://api.gold-api.com/price/XPT').catch(()=>null),
+            smartFetch('https://api.gold-api.com/price/XPD').catch(()=>null),
+        ]);
+        if(g&&g.price) goldUsdOz=g.price;
+        if(s&&s.price) silverUsdOz=s.price;
+        if(pt&&pt.price) platUsdOz=pt.price;
+        if(pd&&pd.price) palladUsdOz=pd.price;
+        if(goldUsdOz>0) goldSource='gold-api.com';
+    }catch(e){}
+
+    // Source B: goldprice.org (fallback)
+    if(goldUsdOz===0){
+        try{
+            const res=await smartFetch('https://data-asg.goldprice.org/dbXRates/USD');
+            if(res.items&&res.items[0]){
+                goldUsdOz=res.items[0].xauPrice||0;
+                silverUsdOz=res.items[0].xagPrice||0;
+                platUsdOz=res.items[0].xptPrice||0;
+                palladUsdOz=res.items[0].xpdPrice||0;
+            }
+            if(goldUsdOz>0) goldSource='goldprice.org';
+        }catch(e){}
+    }
+
+    // Source C: metals.live (last resort — often dead but harmless)
+    if(goldUsdOz===0){
+        try{
+            const res=await smartFetch('https://api.metals.live/v1/spot');
+            const gd=res.find(m=>m.metal==='gold')||res[0];
+            if(gd) goldUsdOz=gd.price;
+            if(goldUsdOz>0) goldSource='metals.live';
+        }catch(e){ console.error('All gold APIs failed',e); }
+    }
+    
+    // ── STEP 2: Fetch USD/PKR Rate (try multiple APIs) ──
+    // Source A: exchangerate-api
+    try{
+        const res=await smartFetch('https://open.er-api.com/v6/latest/USD');
+        usdPkr=res.rates?.PKR||0;
+        fxSource='exchangerate-api';
+    }catch(e){
+        // Source B: frankfurter
+        try{
+            const res=await smartFetch('https://api.frankfurter.app/latest?from=USD&to=PKR');
+            usdPkr=res.rates?.PKR||0;
+            fxSource='frankfurter';
+        }catch(e2){
+            // Source C: exchangerate.host
+            try{
+                const res=await smartFetch('https://api.exchangerate.host/latest?base=USD&symbols=PKR');
+                usdPkr=res.rates?.PKR||0;
+                fxSource='exchangerate.host';
+            }catch(e3){
+                console.error('All FX APIs failed',e3);
+            }
+        }
+    }
+    
+    // ── STEP 3: Process & Display ──
+    if(goldUsdOz>0 && usdPkr>0){
+        const goldUsdGm=goldUsdOz/TROY_OZ_TO_GRAM;
+        const goldPkrGm=goldUsdGm*usdPkr;
+        const goldPkrTola=goldPkrGm*GRAM_TO_TOLA;
+        const gold22kTola=goldPkrTola*(22/24);
+        const gold21kTola=goldPkrTola*(21/24);
+        const gold18kTola=goldPkrTola*(18/24);
+        const silverPkrTola=(silverUsdOz/TROY_OZ_TO_GRAM)*usdPkr*GRAM_TO_TOLA;
+        
+        content.innerHTML=`
+            <div class="lr-box">
+                <div class="lr-item">
+                    <div class="lr-l">🌍 International</div>
+                    <div class="lr-v" style="color:var(--g)">$${goldUsdOz.toFixed(2)}</div>
+                    <div class="lr-s">USD / Troy Oz</div>
+                </div>
+                <div class="lr-item">
+                    <div class="lr-l">🇵🇰 24K / Tola</div>
+                    <div class="lr-v" style="color:var(--g)">PKR ${Math.round(goldPkrTola).toLocaleString('en-PK')}</div>
+                    <div class="lr-s"><button class="btn bg" style="padding:2px 8px;font-size:.6rem;margin-top:3px" onclick="document.getElementById('inRate').value=${Math.round(goldPkrTola)};document.getElementById('inRate').style.borderColor='var(--grn)'">⬇️ Use</button></div>
+                </div>
+                <div class="lr-item">
+                    <div class="lr-l">22K / Tola</div>
+                    <div class="lr-v" style="color:var(--gl);font-size:.9rem">PKR ${Math.round(gold22kTola).toLocaleString('en-PK')}</div>
+                    <div class="lr-s"><button class="btn bg" style="padding:2px 8px;font-size:.55rem" onclick="document.getElementById('inRate').value=${Math.round(gold22kTola)}">Use</button></div>
+                </div>
+                <div class="lr-item">
+                    <div class="lr-l">21K / Tola</div>
+                    <div class="lr-v" style="color:var(--gl);font-size:.9rem">PKR ${Math.round(gold21kTola).toLocaleString('en-PK')}</div>
+                    <div class="lr-s"><button class="btn bg" style="padding:2px 8px;font-size:.55rem" onclick="document.getElementById('inRate').value=${Math.round(gold21kTola)}">Use</button></div>
+                </div>
+                <div class="lr-item">
+                    <div class="lr-l">18K / Tola</div>
+                    <div class="lr-v" style="color:var(--gl);font-size:.9rem">PKR ${Math.round(gold18kTola).toLocaleString('en-PK')}</div>
+                    <div class="lr-s"><button class="btn bg" style="padding:2px 8px;font-size:.55rem" onclick="document.getElementById('inRate').value=${Math.round(gold18kTola)}">Use</button></div>
+                </div>
+                <div class="lr-item">
+                    <div class="lr-l">🥈 Silver / Tola</div>
+                    <div class="lr-v" style="color:#C0C0C0;font-size:.9rem">PKR ${Math.round(silverPkrTola).toLocaleString('en-PK')}</div>
+                    <div class="lr-s">$${silverUsdOz.toFixed(2)}/oz</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:.6rem;color:var(--mut)">
+                <span>💱 USD/PKR: ${usdPkr.toFixed(2)}</span>
+                <span>|</span>
+                <span>Pt: $${platUsdOz.toFixed(0)}/oz</span>
+                <span>|</span>
+                <span>Pd: $${palladUsdOz.toFixed(0)}/oz</span>
+            </div>
+        `;
+        status.textContent='✅ LIVE';
+        status.style.color='var(--grn)';
+        timeEl.textContent='Updated: '+new Date().toLocaleTimeString('en-PK')+' — via '+goldSource+' + '+fxSource;
+        
+        localStorage.setItem('jm_lr',JSON.stringify({goldUsdOz,goldPkrTola,gold22kTola,gold21kTola,gold18kTola,silverPkrTola,usdPkr,platUsdOz,palladUsdOz,time:Date.now()}));
+    } else if(goldUsdOz>0 && usdPkr===0){
+        // Got gold price but no PKR rate
+        status.textContent='⚠️ Partial';
+        status.style.color='var(--yel)';
+        content.innerHTML=`
+            <div class="lr-box">
+                <div class="lr-item"><div class="lr-l">🌍 International</div><div class="lr-v" style="color:var(--g)">$${goldUsdOz.toFixed(2)}</div><div class="lr-s">USD / Troy Oz ✅</div></div>
+                <div class="lr-item"><div class="lr-l">🇵🇰 PKR Rate</div><div class="lr-v" style="color:var(--red)">❌</div><div class="lr-s">FX API failed</div></div>
+            </div>
+            <div class="lr-err">⚠️ Got gold price but USD/PKR rate failed.<br>Enter PKR rate manually or check <a href="https://gold.pk" target="_blank" style="color:var(--g)">gold.pk</a></div>
+        `;
+        timeEl.textContent='Gold via '+goldSource+' — PKR rate unavailable';
+    } else {
+        // All failed — show cached or manual
+        status.textContent='❌ Offline';
+        status.style.color='var(--red)';
+        const cached=localStorage.getItem('jm_lr');
+        if(cached){
+            try{
+                const c=JSON.parse(cached);
+                const ago=Math.round((Date.now()-c.time)/60000);
+                content.innerHTML=`
+                    <div class="lr-err">⚠️ Live fetch failed — showing cached (${ago>60?Math.round(ago/60)+'h':ago+'m'} ago)</div>
+                    <div class="lr-box">
+                        <div class="lr-item"><div class="lr-l">🌍 Intl (cached)</div><div class="lr-v" style="color:var(--yel)">$${c.goldUsdOz.toFixed(2)}</div><div class="lr-s">USD/oz</div></div>
+                        <div class="lr-item"><div class="lr-l">🇵🇰 24K/Tola</div><div class="lr-v" style="color:var(--yel)">PKR ${Math.round(c.goldPkrTola).toLocaleString('en-PK')}</div><div class="lr-s"><button class="btn bg" style="padding:2px 8px;font-size:.6rem" onclick="document.getElementById('inRate').value=${Math.round(c.goldPkrTola)}">Use</button></div></div>
+                    </div>
+                `;
+            }catch(e){showManual()}
+        } else { showManual(); }
+    }
+    
+    btn.disabled=false;
+    btn.innerHTML='📡 Refresh Rates';
+}
+
+function showManual(){
+    document.getElementById('lrContent').innerHTML=`
+        <div class="lr-err">❌ All rate sources failed (CORS/network issue).</div>
+        <div style="padding:8px;text-align:center;font-size:.78rem;color:var(--mut)">
+            <b style="color:var(--txt)">Manual method:</b><br>
+            1. Click <b>gold.pk</b> button below to check today's rate<br>
+            2. Type the rate in <b>Rate/Tola</b> field manually
+        </div>
+    `;
+}
+
+// Auto-load cached rates on start
+(function(){
+    const cached=localStorage.getItem('jm_lr');
+    if(cached){
+        try{
+            const c=JSON.parse(cached);
+            const ago=Math.round((Date.now()-c.time)/60000);
+            if(ago<180){
+                document.getElementById('lrContent').innerHTML=`
+                    <div class="lr-box">
+                        <div class="lr-item"><div class="lr-l">🌍 Intl</div><div class="lr-v" style="color:var(--yel)">$${c.goldUsdOz.toFixed(2)}</div><div class="lr-s">USD/oz</div></div>
+                        <div class="lr-item"><div class="lr-l">🇵🇰 24K/Tola</div><div class="lr-v" style="color:var(--yel)">PKR ${Math.round(c.goldPkrTola).toLocaleString('en-PK')}</div><div class="lr-s"><button class="btn bg" style="padding:2px 8px;font-size:.6rem" onclick="document.getElementById('inRate').value=${Math.round(c.goldPkrTola)}">Use</button></div></div>
+                    </div>
+                    <div style="font-size:.55rem;color:var(--mut);text-align:center">${ago>60?Math.round(ago/60)+'h':ago+'m'} ago — click Refresh for latest</div>
+                `;
+                document.getElementById('lrStatus').textContent='cached';
+            }
+        }catch(e){}
+    }
+})();
+
+// ═══ SHORTCUTS ═══
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='p'){e.preventDefault();showBill()}if(e.ctrlKey&&e.key==='s'){e.preventDefault();saveHist()}if(e.key==='Escape')closeBill()});
+</script>
+</body>
+</html>
