@@ -1601,7 +1601,7 @@ function calc(){
     renderComp(det.comp,wA);
 
     // Weight table
-    renderWT(wA,pureGm,impGm,ktGm,balGm);
+    renderWT(wA,pureGm,impGm,ktGm,rdGm,raGm,balGm);
 
     // Price
     st('pGP','PKR '+fm(metalPr));st('pCh','PKR '+fm(chgAmt));st('pWs','PKR '+fm(wstAmt));
@@ -1625,17 +1625,21 @@ function renderComp(comp,wt){
 }
 
 // ═══ WEIGHT TABLE ═══
-function renderWT(tot,pure,imp,kaat,bal){
+function renderWT(tot,pure,imp,kaat,rdIn,raOut,bal){
     const rows=[
         {l:'Total Weight',g:tot,s:''},
         {l:'Pure Metal',g:pure,s:'color:var(--grn)'},
         {l:'Impure',g:imp,s:'color:var(--red)'},
-        {l:'Kaat Deduct',g:kaat,s:''},
-        {l:'🏆 Balance',g:bal,s:'color:var(--g);font-weight:900'},
     ];
+    if(kaat>0) rows.push({l:'✂️ Kaat Deduct',g:kaat,s:'color:var(--yel)',sign:'−'});
+    else rows.push({l:'Kaat Deduct',g:kaat,s:'',sign:''});
+    if(rdIn>0) rows.push({l:'⬇️ Ratti IN Deduct',g:rdIn,s:'color:var(--yel)',sign:'−'});
+    if(raOut>0) rows.push({l:'⬆️ Ratti OUT Add',g:raOut,s:'color:var(--grn)',sign:'+'});
+    rows.push({l:'🏆 Balance',g:bal,s:'color:var(--g);font-weight:900'});
     document.getElementById('wtB').innerHTML=rows.map(r=>{
         const u=toU(r.g);
-        return`<tr><td class="wl" style="${r.s}">${r.l}</td><td>${u.t}</td><td>${u.m}</td><td>${u.r}</td><td style="${r.s};font-weight:700">${u.g}</td><td>${u.mg}</td></tr>`;
+        const sign=r.sign||'';
+        return`<tr><td class="wl" style="${r.s}">${r.l}</td><td>${sign?sign+u.t:u.t}</td><td>${u.m}</td><td>${u.r}</td><td style="${r.s};font-weight:700">${sign}${u.g}</td><td>${sign}${u.mg}</td></tr>`;
     }).join('');
 }
 function toU(g){const tr=g/RATTI;const t=Math.floor(tr/RPT);const r1=tr-t*RPT;const m=Math.floor(r1/RPM);const r=r1-m*RPM;return{t,m,r:r.toFixed(2),g:g.toFixed(3),mg:Math.round(g*1000)}}
