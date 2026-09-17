@@ -391,6 +391,26 @@ input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
         </div>
     </div>
 
+    <!-- 3-Way Alloy Analysis (matches Pakistani lab convention: Mix + Silver + Ternary) -->
+    <div class="cd" id="alloy3Card" style="display:none">
+        <div class="cd-h">🔬 3-Way Alloy Analysis <span style="margin-left:auto;font-size:.6rem;color:var(--mut);font-weight:400">Pakistani lab convention</span></div>
+        <div class="cd-b" style="padding:0">
+            <table class="wt" style="font-size:.78rem">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;padding-left:12px">Model</th>
+                        <th>Karat</th>
+                        <th>Pure (g)</th>
+                        <th>Impure (g)</th>
+                        <th>Impure Ratti</th>
+                    </tr>
+                </thead>
+                <tbody id="alloy3B"></tbody>
+            </table>
+            <div id="alloy3Note" style="padding:8px 12px;font-size:.68rem;color:var(--mut);border-top:1px solid var(--bdr);line-height:1.5"></div>
+        </div>
+    </div>
+
     <!-- Multi-Test Comparison -->
     <div class="cd" id="multiCard" style="display:none">
         <div class="cd-h">📊 Multi-Test Comparison</div>
@@ -1591,6 +1611,9 @@ function calc(){
     // Weight table
     renderWT(wA,pureGm,impGm,rdGm,raGm,balGm);
 
+    // 3-Way Alloy Analysis (Pakistani lab convention)
+    render3WayAlloy(density,wA,det);
+
     // Price
     st('pGP','PKR '+fm(metalPr));st('pCh','PKR '+fm(chgAmt));st('pWs','PKR '+fm(wstAmt));
     st('pTot','PKR '+fm(Math.round(total)));st('pBal',balGm.toFixed(3)+' gm');
@@ -1630,6 +1653,55 @@ function renderWT(tot,pure,imp,rdIn,raOut,bal){
 }
 function toU(g){const tr=g/RATTI;const t=Math.floor(tr/RPT);const r1=tr-t*RPT;const m=Math.floor(r1/RPM);const r=r1-m*RPM;return{t,m,r:r.toFixed(2),g:g.toFixed(3),mg:Math.round(g*1000)}}
 
+// ═══ 3-WAY ALLOY ANALYSIS ═══
+// Shows Silver-binary, Mix-binary, and Ternary readings side-by-side
+// Matches traditional Pakistani lab practice of computing "Mix" + "Silver" readings
+function karatBinaryAg(density){
+    const gf=Math.max(0,Math.min(1,(1/MD.Ag-1/density)/(1/MD.Ag-1/MD.Au)));
+    return gf*24;
+}
+function karatBinaryCu(density){
+    const gf=Math.max(0,Math.min(1,(1/MD.Cu-1/density)/(1/MD.Cu-1/MD.Au)));
+    return gf*24;
+}
+function render3WayAlloy(density,wA,det){
+    const card=document.getElementById('alloy3Card');
+    // Only meaningful for gold-alloy range
+    if(!det||det.karat<=0||det.cat==='fake'||det.cat==='platinum'||det.cat==='silver'||det.cat==='palladium'||density<12.5||density>19.35){
+        card.style.display='none';return;
+    }
+    card.style.display='block';
+    const kAg=karatBinaryAg(density);
+    const kCu=karatBinaryCu(density);
+    const kTe=det.karat; // ternary from detection
+    const rows=[
+        {label:'🥈 Silver (Au-Ag binary)', color:'#8ab4f8', k:kAg, note:'Assume alloy = Silver only'},
+        {label:'🟠 Mix (Au-Cu binary)',   color:'#e8a552', k:kCu, note:'Assume alloy = Copper only'},
+        {label:'⚙️ Ternary (Au-Ag-Cu)',   color:'var(--g)', k:kTe, note:'Realistic Ag+Cu mix (software default)'},
+    ];
+    document.getElementById('alloy3B').innerHTML=rows.map(r=>{
+        const pureG=wA*(r.k/24);
+        const impG=wA-pureG;
+        const impRatti=(impG/RATTI).toFixed(2);
+        return`<tr>
+            <td class="wl" style="color:${r.color};text-align:left;padding-left:12px">${r.label}</td>
+            <td style="font-weight:700">${r.k.toFixed(2)}K</td>
+            <td style="color:var(--grn)">${pureG.toFixed(3)}</td>
+            <td style="color:var(--red)">${impG.toFixed(3)}</td>
+            <td style="font-weight:900;color:${r.color}">${impRatti}</td>
+        </tr>`;
+    }).join('');
+    // Note explaining what "matches your paper"
+    const noteEl=document.getElementById('alloy3Note');
+    noteEl.innerHTML=`
+        <b style="color:var(--txt)">📖 Paper reference:</b>
+        <span style="color:#8ab4f8">"Silver"</span> column ↔ <b>🥈 row</b> ·
+        <span style="color:#e8a552">"Mix"</span> column ↔ <b>🟠 row</b> ·
+        <b>⚙️ Ternary</b> is the realistic Au-Ag-Cu blend used for main display.
+        <br>💡 Density = ${density.toFixed(3)} g/cm³ | Air = ${wA.toFixed(3)}g
+    `;
+}
+
 // ═══ MULTI-TEST COMPARE ═══
 function addMulti(){
     if(!last)return alert('Calculate first!');
@@ -1661,6 +1733,7 @@ function clr(){
     document.getElementById('inAir').value='';document.getElementById('inWater').value='';
     document.getElementById('detBan').style.display='none';
     document.getElementById('confCard').style.display='none';
+    document.getElementById('alloy3Card').style.display='none';
     ['rK','rH','rP','rD','gVal'].forEach(id=>st(id,'—'));
     ['rKs','rHs','rPs','gH','gLbl'].forEach(id=>st(id,''));
     st('gLbl','KARAT');
