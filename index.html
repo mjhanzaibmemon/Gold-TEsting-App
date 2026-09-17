@@ -306,20 +306,11 @@ input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
         <div class="cd-h"><span data-i18n="hdr_price">💰 Price</span> <span id="autoRateBadge" style="margin-left:auto;font-size:.55rem;padding:2px 6px;border-radius:4px;display:none"></span></div>
         <div class="cd-b">
             <div class="rw"><div class="ig"><label id="rateLabel" data-i18n="lbl_rate_tola">Rate / Tola</label><input type="number" step="any" id="inRate" placeholder="0" oninput="this.dataset.manual=this.value?'1':''"></div><div class="ig"><label data-i18n="lbl_charges">Charges</label><input type="number" step="any" id="inChg" value="0"></div></div>
-            <div class="rw"><div class="ig"><label data-i18n="lbl_ratti_in">Ratti IN / Tola</label><input type="number" step="any" id="inRI" value="0"></div><div class="ig"><label data-i18n="lbl_ratti_out">Ratti OUT / Tola</label><input type="number" step="any" id="inRO" value="0"></div></div>
+            <div class="rw"><div class="ig"><label data-i18n="lbl_ratti_in">Ratti Deduction</label><input type="number" step="any" id="inRI" value="0" placeholder="ratti"></div><div class="ig"><label data-i18n="lbl_ratti_out">Ratti Bonus</label><input type="number" step="any" id="inRO" value="0" placeholder="ratti"></div></div>
             <div class="rw"><div class="ig"><label data-i18n="lbl_making">Making / gm</label><input type="number" step="any" id="inMk" value="0"></div><div class="ig"><label data-i18n="lbl_wastage">Wastage %</label><input type="number" step="any" id="inWst" value="0"></div></div>
         </div>
     </div>
-    <div class="cd">
-        <div class="cd-h" data-i18n="hdr_kaat">✂️ Kaat</div>
-        <div class="cd-b">
-            <div class="rw">
-                <div class="ig"><label data-i18n="lbl_tola">Tola</label><input type="number" step="any" id="ktT" value="0"></div>
-                <div class="ig"><label data-i18n="lbl_masha">Masha</label><input type="number" step="any" id="ktM" value="0"></div>
-                <div class="ig"><label data-i18n="lbl_ratti">Ratti</label><input type="number" step="any" id="ktR" value="0"></div>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 <!-- RIGHT -->
@@ -394,7 +385,6 @@ input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
                     <tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr>
                     <tr><td class="wl" style="color:var(--grn)">Pure</td><td colspan="5" style="color:var(--mut)">—</td></tr>
                     <tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr>
-                    <tr><td class="wl">Kaat</td><td colspan="5" style="color:var(--mut)">—</td></tr>
                     <tr><td class="wl" style="color:var(--g)">Balance</td><td colspan="5" style="color:var(--mut)">—</td></tr>
                 </tbody>
             </table>
@@ -1013,15 +1003,14 @@ const I18N = {
     hdr_weights: {en:'⚖️ Weights', ur:'⚖️ وزن'},
     hdr_live_rates: {en:'📡 Live Metal Rates', ur:'📡 لائیو دھاتوں کے ریٹ'},
     hdr_price: {en:'💰 Price', ur:'💰 قیمت'},
-    hdr_kaat: {en:'✂️ Kaat', ur:'✂️ کاٹ'},
 
     // Input labels
     lbl_air: {en:'Weight in Air', ur:'ہوا میں وزن'},
     lbl_water: {en:'Weight in Water', ur:'پانی میں وزن'},
     lbl_rate_tola: {en:'Rate / Tola', ur:'ریٹ / تولہ'},
     lbl_charges: {en:'Charges', ur:'محصولات'},
-    lbl_ratti_in: {en:'Ratti IN / Tola', ur:'رتی ان / تولہ'},
-    lbl_ratti_out: {en:'Ratti OUT / Tola', ur:'رتی آؤٹ / تولہ'},
+    lbl_ratti_in: {en:'Ratti Deduction', ur:'رتی کٹوتی'},
+    lbl_ratti_out: {en:'Ratti Bonus', ur:'رتی بونس'},
     lbl_making: {en:'Making / gm', ur:'میکنگ / گرام'},
     lbl_wastage: {en:'Wastage %', ur:'ضیاعت %'},
     lbl_tola: {en:'Tola', ur:'تولہ'},
@@ -1497,12 +1486,11 @@ function calc(){
     // Weights
     const pureGm=wA*(det.purity/100);
     const impGm=wA-pureGm;
-    const ktGm=(pf('ktT')||0)*TOLA+(pf('ktM')||0)*MASHA+(pf('ktR')||0)*RATTI;
     const ri=pf('inRI')||0;
     const ro=pf('inRO')||0;
     const rdGm=ri*RATTI*(pureGm/TOLA);
     const raGm=ro*RATTI*(pureGm/TOLA);
-    const balGm=Math.max(0,pureGm-ktGm-rdGm+raGm);
+    const balGm=Math.max(0,pureGm-rdGm+raGm);
 
     // Price — Auto-rate based on detected metal
     const autoRateInfo=getAutoRate(det);
@@ -1601,14 +1589,14 @@ function calc(){
     renderComp(det.comp,wA);
 
     // Weight table
-    renderWT(wA,pureGm,impGm,ktGm,rdGm,raGm,balGm);
+    renderWT(wA,pureGm,impGm,rdGm,raGm,balGm);
 
     // Price
     st('pGP','PKR '+fm(metalPr));st('pCh','PKR '+fm(chgAmt));st('pWs','PKR '+fm(wstAmt));
     st('pTot','PKR '+fm(Math.round(total)));st('pBal',balGm.toFixed(3)+' gm');
 
     // Store
-    last={...det,wA,wW,tmp,wd,vol,diff,density,spGravity,buoyancy,fineness,atomPct,spread,pureGm,impGm,ktGm,rdGm,balGm,rate,rgm,metalPr,chgAmt,wstAmt,total,conf,autoRateInfo,date:new Date().toISOString()};
+    last={...det,wA,wW,tmp,wd,vol,diff,density,spGravity,buoyancy,fineness,atomPct,spread,pureGm,impGm,rdGm,raGm,balGm,rate,rgm,metalPr,chgAmt,wstAmt,total,conf,autoRateInfo,date:new Date().toISOString()};
 }
 
 // ═══ RENDER COMPOSITION ═══
@@ -1625,16 +1613,14 @@ function renderComp(comp,wt){
 }
 
 // ═══ WEIGHT TABLE ═══
-function renderWT(tot,pure,imp,kaat,rdIn,raOut,bal){
+function renderWT(tot,pure,imp,rdIn,raOut,bal){
     const rows=[
         {l:'Total Weight',g:tot,s:''},
         {l:'Pure Metal',g:pure,s:'color:var(--grn)'},
         {l:'Impure',g:imp,s:'color:var(--red)'},
     ];
-    if(kaat>0) rows.push({l:'✂️ Kaat Deduct',g:kaat,s:'color:var(--yel)',sign:'−'});
-    else rows.push({l:'Kaat Deduct',g:kaat,s:'',sign:''});
-    if(rdIn>0) rows.push({l:'⬇️ Ratti IN Deduct',g:rdIn,s:'color:var(--yel)',sign:'−'});
-    if(raOut>0) rows.push({l:'⬆️ Ratti OUT Add',g:raOut,s:'color:var(--grn)',sign:'+'});
+    if(rdIn>0) rows.push({l:'⬇️ Ratti Deduction',g:rdIn,s:'color:var(--yel)',sign:'−'});
+    if(raOut>0) rows.push({l:'⬆️ Ratti Bonus',g:raOut,s:'color:var(--grn)',sign:'+'});
     rows.push({l:'🏆 Balance',g:bal,s:'color:var(--g);font-weight:900'});
     document.getElementById('wtB').innerHTML=rows.map(r=>{
         const u=toU(r.g);
@@ -1680,7 +1666,7 @@ function clr(){
     st('gLbl','KARAT');
     document.getElementById('gArc').style.strokeDashoffset=534;
     document.getElementById('compBox').innerHTML='<div style="text-align:center;color:var(--mut);padding:16px">Enter weights → Auto detect</div>';
-    document.getElementById('wtB').innerHTML='<tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--grn)">Pure</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl">Kaat</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--g)">Balance</td><td colspan="5" style="color:var(--mut)">—</td></tr>';
+    document.getElementById('wtB').innerHTML='<tr><td class="wl">Total</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--grn)">Pure</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--red)">Impure</td><td colspan="5" style="color:var(--mut)">—</td></tr><tr><td class="wl" style="color:var(--g)">Balance</td><td colspan="5" style="color:var(--mut)">—</td></tr>';
     ['aVol','aSG','aBuoy','aWD','aFine','aAtom','aSpread','aAlloy'].forEach(id=>st(id,'—'));
     ['pGP','pCh','pWs','pTot','pBal'].forEach(id=>st(id,'—'));
     // Reset auto-rate
@@ -1723,6 +1709,8 @@ function showBill(){
         <div class="brow"><span>Total</span><span>${r.wA.toFixed(3)} g</span></div>
         <div class="brow" style="color:green"><span>Pure</span><span>${r.pureGm.toFixed(3)} g</span></div>
         <div class="brow" style="color:red"><span>Impure</span><span>${r.impGm.toFixed(3)} g</span></div>
+        ${(r.rdGm||0)>0?`<div class="brow" style="color:#c90"><span>⬇️ Ratti Deduction</span><span>− ${r.rdGm.toFixed(3)} g</span></div>`:''}
+        ${(r.raGm||0)>0?`<div class="brow" style="color:green"><span>⬆️ Ratti Bonus</span><span>+ ${r.raGm.toFixed(3)} g</span></div>`:''}
         <div class="brow bold"><span>Balance</span><span>${r.balGm.toFixed(3)} g</span></div>
         <hr>
         <div class="bctr">═══ PRICE ═══</div>
