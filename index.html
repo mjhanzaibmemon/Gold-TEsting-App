@@ -1679,6 +1679,20 @@ function render3WayAlloy(density,wA,det){
         {label:'🟠 Mix (Au-Cu binary)',   color:'#e8a552', k:kCu, note:'Assume alloy = Copper only'},
         {label:'⚙️ Ternary (Au-Ag-Cu)',   color:'var(--g)', k:kTe, note:'Realistic Ag+Cu mix (software default)'},
     ];
+    const savedManualK=parseFloat(document.getElementById('manualKarat')?.value)||0;
+    let manualRow='';
+    if(savedManualK>0 && savedManualK<=24){
+        const pureG=wA*(savedManualK/24);
+        const impG=wA-pureG;
+        const impRatti=(impG/RATTI).toFixed(2);
+        manualRow=`<tr style="background:rgba(212,175,55,.08)">
+            <td class="wl" style="color:var(--g);text-align:left;padding-left:12px">✍️ Manual Karat</td>
+            <td style="font-weight:700">${savedManualK.toFixed(2)}K</td>
+            <td style="color:var(--grn)">${pureG.toFixed(3)}</td>
+            <td style="color:var(--red)">${impG.toFixed(3)}</td>
+            <td style="font-weight:900;color:var(--g)">${impRatti}</td>
+        </tr>`;
+    }
     document.getElementById('alloy3B').innerHTML=rows.map(r=>{
         const pureG=wA*(r.k/24);
         const impG=wA-pureG;
@@ -1690,16 +1704,46 @@ function render3WayAlloy(density,wA,det){
             <td style="color:var(--red)">${impG.toFixed(3)}</td>
             <td style="font-weight:900;color:${r.color}">${impRatti}</td>
         </tr>`;
-    }).join('');
-    // Note explaining what "matches your paper"
+    }).join('')+manualRow;
+    // Note + Manual Karat input (matches market/XRF/hallmark-based software)
     const noteEl=document.getElementById('alloy3Note');
     noteEl.innerHTML=`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px dashed var(--bdr)">
+            <b style="color:var(--g)">✍️ Manual Karat Match:</b>
+            <input type="number" step="0.01" id="manualKarat" placeholder="e.g. 22.5" value="${savedManualK||''}"
+                oninput="window.__updateManualKarat()"
+                style="width:90px;padding:5px 8px;background:var(--inp);border:1px solid var(--g);border-radius:4px;color:var(--txt);font-size:.78rem;font-weight:700">
+            <span style="font-size:.68rem;color:var(--mut)">← Paper ki karat likho, ratti auto-calculate hoga</span>
+        </div>
         <b style="color:var(--txt)">📖 Paper reference:</b>
-        <span style="color:#8ab4f8">"Silver"</span> column ↔ <b>🥈 row</b> ·
-        <span style="color:#e8a552">"Mix"</span> column ↔ <b>🟠 row</b> ·
-        <b>⚙️ Ternary</b> is the realistic Au-Ag-Cu blend used for main display.
+        <span style="color:#8ab4f8">"Silver"</span> = <b>🥈 row</b> |
+        <span style="color:#e8a552">"Mix"</span> = <b>🟠 row</b> |
+        <b>⚙️ Ternary</b> = realistic default
         <br>💡 Density = ${density.toFixed(3)} g/cm³ | Air = ${wA.toFixed(3)}g
     `;
+}
+// Live-update manual karat row without re-running full calc
+window.__updateManualKarat=function(){
+    if(!last) return;
+    const k=parseFloat(document.getElementById('manualKarat').value);
+    const wA=last.wA;
+    const rows=document.querySelectorAll('#alloy3B tr');
+    if(!(k>0&&k<=24)){
+        if(rows.length>3) rows[3].remove();
+        return;
+    }
+    const pureG=wA*(k/24);
+    const impG=wA-pureG;
+    const impRatti=(impG/RATTI).toFixed(2);
+    const html=`<tr style="background:rgba(212,175,55,.08)">
+        <td class="wl" style="color:var(--g);text-align:left;padding-left:12px">✍️ Manual Karat</td>
+        <td style="font-weight:700">${k.toFixed(2)}K</td>
+        <td style="color:var(--grn)">${pureG.toFixed(3)}</td>
+        <td style="color:var(--red)">${impG.toFixed(3)}</td>
+        <td style="font-weight:900;color:var(--g)">${impRatti}</td>
+    </tr>`;
+    if(rows.length>3){rows[3].outerHTML=html;}
+    else{document.getElementById('alloy3B').insertAdjacentHTML('beforeend',html);}
 }
 
 // ═══ MULTI-TEST COMPARE ═══
